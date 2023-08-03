@@ -1,8 +1,8 @@
 {
-  "name": "bakapipboyjailbreak",
+  "name": "bakafullscreenpipboy",
   "version-string": "1.0.0",
   "description": "",
-  "homepage": "https://github.com/shad0wshayd3/BakaPipboyJailbreak",
+  "homepage": "https://github.com/shad0wshayd3/BakaFullscreenPipboy",
   "license": "MIT",
   "dependencies": [
     "autotoml",

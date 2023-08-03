@@ -88,7 +88,7 @@ extern "C" DLLEXPORT bool F4SEAPI F4SEPlugin_Load(const F4SE::LoadInterface* a_F
 	}
 
 	const auto papyrus = F4SE::GetPapyrusInterface();
-	if (!papyrus || !papyrus->Register(Papyrus::BakaPipboyJailbreak::Register))
+	if (!papyrus || !papyrus->Register(Papyrus::BakaFullscreenPipboy::Register))
 	{
 		logger::error("failed to register papyrus functions."sv);
 		return false;

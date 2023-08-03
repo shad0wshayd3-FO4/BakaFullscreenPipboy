@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-set(NAME "BakaPipboyJailbreak")
+set(NAME "BakaFullscreenPipboy")
 set(VERSION 1.0.0)
 
 # ---- Options ----

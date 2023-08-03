@@ -4,7 +4,7 @@
 
 namespace Papyrus
 {
-	class BakaPipboyJailbreak
+	class BakaFullscreenPipboy
 	{
 	public:
 		static bool Register(RE::BSScript::IVirtualMachine* a_vm)
@@ -16,7 +16,7 @@ namespace Papyrus
 		}
 
 	private:
-		static constexpr char CLASS_NAME[] = "BakaPipboyJailbreak";
+		static constexpr char CLASS_NAME[] = "BakaFullscreenPipboy";
 
 		static void UpdateSettings(std::monostate)
 		{

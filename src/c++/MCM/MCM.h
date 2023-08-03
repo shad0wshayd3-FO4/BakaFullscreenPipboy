@@ -48,8 +48,8 @@ namespace MCM
 				Renderer->Release();
 			}
 
-			m_ini_base.LoadFile("Data/MCM/Config/BakaPipboyJailbreak/settings.ini");
-			m_ini_user.LoadFile("Data/MCM/Settings/BakaPipboyJailbreak.ini");
+			m_ini_base.LoadFile("Data/MCM/Config/BakaFullscreenPipboy/settings.ini");
+			m_ini_user.LoadFile("Data/MCM/Settings/BakaFullscreenPipboy.ini");
 
 			// Pipboy
 			GetModSettingBool("Pipboy", "bEnable", Pipboy::bEnable);
