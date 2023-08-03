@@ -1,14 +1,15 @@
 {
-  "name": "bakaplugintemplate",
+  "name": "bakapipboyjailbreak",
   "version-string": "1.0.0",
-  "description": "F4SE plugin template using CommonLibF4.",
-  "homepage": "https://github.com/shad0wshayd3/BakaPluginTemplate",
+  "description": "",
+  "homepage": "https://github.com/shad0wshayd3/BakaPipboyJailbreak",
   "license": "MIT",
   "dependencies": [
     "autotoml",
     "boost-stl-interfaces",
     "fmt",
     "rsm-mmio",
+    "simpleini",
     "spdlog",
     "xbyak"
   ]
