@@ -241,7 +241,7 @@ private:
 			if (auto PipboyManager = RE::PipboyManager::GetSingleton())
 			{
 				if (!MCM::Settings::Pipboy::bEnable
-					|| PipboyManager->menuToOpen == "GenericMenu"sv
+				    || PipboyManager->menuToOpen == "GenericMenu"sv
 				    || PipboyManager->menuToOpen == "PipboyOpeningSequenceMenu"sv)
 				{
 					return true;
@@ -412,7 +412,7 @@ private:
 			}
 
 			if (MCM::Settings::Pipboy::bDisableFX
-				&& MCM::Settings::Pipboy::bUseColor)
+			    && MCM::Settings::Pipboy::bUseColor)
 			{
 				detail::SetColorHelper(GameMenuBase, COLOR);
 			}
@@ -569,8 +569,8 @@ private:
 				return _SetViewport(a_this, a_ui, a_viewport);
 			}
 
-			if (MCM::Settings::Pipboy::bDisableFX 
-				&& MCM::Settings::Pipboy::bUseColor)
+			if (MCM::Settings::Pipboy::bDisableFX
+			    && MCM::Settings::Pipboy::bUseColor)
 			{
 				if (auto UI = RE::UI::GetSingleton())
 				{
