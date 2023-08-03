@@ -67,6 +67,7 @@ public:
 
 	static void InstallPostLoad()
 	{
+		detail::PipBckScreenModel::Install();
 		detail::PipboyScreenModel::Install();
 	}
 
@@ -74,6 +75,144 @@ private:
 	class detail
 	{
 	public:
+		class PipBckScreenModel :
+			public RE::BSTEventSink<RE::UIAdvanceMenusFunctionCompleteEvent>
+		{
+		public:
+			PipBckScreenModel()
+			{
+				auto args = RE::BSModelDB::DBTraits::ArgsType{
+					RE::ENUM_LOD_MULT::kNone,
+					0,
+					true,
+					false,
+					true,
+					true,
+					true,
+					true
+				};
+
+				auto State = RE::BSGraphics::State::GetSingleton();
+				auto ModelPath =
+					((State.backBufferWidth / State.backBufferHeight) == (16 / 10))
+						? "Interface\\Objects\\HUDGlassFlat16x10.nif"sv
+						: "Interface\\Objects\\HUDGlassFlat.nif"sv;
+
+				RE::NiTexture::SetAllowDegrade(false);
+				RE::BSModelDB::Demand(
+					ModelPath.data(),
+					&model,
+					args);
+				CreateRenderer();
+				RE::NiTexture::SetAllowDegrade(true);
+
+				if (auto EventSource = RE::UIAdvanceMenusFunctionCompleteEvent::GetEventSource())
+				{
+					EventSource->RegisterSink(this);
+				}
+			}
+
+			virtual ~PipBckScreenModel()
+			{
+				if (auto EventSource = RE::UIAdvanceMenusFunctionCompleteEvent::GetEventSource())
+				{
+					EventSource->UnregisterSink(this);
+				}
+
+				if (auto Renderer = GetRenderer())
+				{
+					Renderer->Release();
+				}
+
+				model.reset();
+				if (singleton == this)
+				{
+					singleton = nullptr;
+				}
+			}
+
+			virtual RE::BSEventNotifyControl ProcessEvent(const RE::UIAdvanceMenusFunctionCompleteEvent&, RE::BSTEventSource<RE::UIAdvanceMenusFunctionCompleteEvent>*) override
+			{
+				return RE::BSEventNotifyControl::kContinue;
+			}
+
+		public:
+			static void Install()
+			{
+				if (!singleton)
+				{
+					singleton = new PipBckScreenModel();
+				}
+			}
+
+			[[nodiscard]] static PipBckScreenModel* GetSingleton()
+			{
+				return singleton;
+			}
+
+			[[nodiscard]] static RE::BSFixedString& GetRendererName()
+			{
+				static RE::BSFixedString rendererName{ "PipBckScreenModel"sv };
+				return rendererName;
+			}
+
+			[[nodiscard]] static RE::Interface3D::Renderer* GetRenderer()
+			{
+				if (auto Renderer = RE::Interface3D::Renderer::GetByName(GetRendererName()))
+				{
+					return Renderer;
+				}
+				return PipBckScreenModel::GetSingleton()->CreateRenderer();
+			}
+
+			F4_HEAP_REDEFINE_NEW();
+
+		private:
+			RE::Interface3D::Renderer* CreateRenderer()
+			{
+				if (!model)
+				{
+					return nullptr;
+				}
+
+				if (auto node = model->IsNode())
+				{
+					RE::NiUpdateData UpdateData;
+					node->local.translate.x = 0;
+					node->local.translate.y = 350;
+					node->local.translate.z = 0;
+					node->Update(UpdateData);
+
+					if (auto Renderer = RE::Interface3D::Renderer::Create(
+							GetRendererName(),
+							RE::UI_DEPTH_PRIORITY::kStandard,
+							0.0f,
+							true))
+					{
+						Renderer->MainScreen_SetBackgroundMode(RE::Interface3D::BackgroundMode::kSolidColor);
+						Renderer->MainScreen_SetScreenAttached3D(node);
+
+						Renderer->Offscreen_SetDisplayMode(
+							RE::Interface3D::ScreenMode::kScreenAttached,
+							nullptr,
+							nullptr);
+
+						Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
+						Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kNone);
+						return Renderer;
+					}
+				}
+
+				return nullptr;
+			}
+
+		protected:
+			// members
+			RE::NiPointer<RE::NiNode> model{ nullptr };
+
+			inline static PipBckScreenModel* singleton{ nullptr };
+		};
+
 		class PipboyScreenModel :
 			public RE::BSTEventSink<RE::UIAdvanceMenusFunctionCompleteEvent>
 		{
@@ -186,13 +325,9 @@ private:
 							GetRendererName(),
 							RE::UI_DEPTH_PRIORITY::kPipboy,
 							0.0f,
-							false))
+							true))
 					{
-						Renderer->MainScreen_SetBackgroundMode(
-							MCM::Settings::Pipboy::bBackground
-								? RE::Interface3D::BackgroundMode::kSolidColor
-								: RE::Interface3D::BackgroundMode::kLive);
-
+						Renderer->MainScreen_SetBackgroundMode(RE::Interface3D::BackgroundMode::kLive);
 						Renderer->MainScreen_SetScreenAttached3D(node);
 						Renderer->MainScreen_SetPostAA(true);
 
@@ -798,6 +933,14 @@ private:
 			switch (a_message.type.get())
 			{
 				case RE::UI_MESSAGE_TYPE::kShow:
+					if (MCM::Settings::Pipboy::bBackground)
+					{
+						if (auto Renderer = detail::PipBckScreenModel::GetRenderer())
+						{
+							Renderer->Enable();
+						}
+					}
+
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 					{
 						Renderer->Enable();
@@ -805,6 +948,14 @@ private:
 					break;
 
 				case RE::UI_MESSAGE_TYPE::kHide:
+					if (MCM::Settings::Pipboy::bBackground)
+					{
+						if (auto Renderer = detail::PipBckScreenModel::GetRenderer())
+						{
+							Renderer->Disable();
+						}
+					}
+
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 					{
 						Renderer->Disable();
