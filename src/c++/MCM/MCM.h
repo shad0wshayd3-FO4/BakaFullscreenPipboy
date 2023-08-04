@@ -14,6 +14,7 @@ namespace MCM
 			inline static bool bUseColorPA{ true };
 			inline static bool bBackground{ false };
 
+			inline static double fBackgroundAlpha{ 1.0 };
 			inline static double fPipboyViewportLeft{ 0.0 };
 			inline static double fPipboyViewportRight{ 1.0 };
 			inline static double fPipboyViewportTop{ 0.0 };
@@ -37,9 +38,17 @@ namespace MCM
 				{
 					if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 					{
-						UIMessageQueue->AddMessage("PipboyMenu"sv, RE::UI_MESSAGE_TYPE::kHide);
+						UIMessageQueue->AddMessage(
+							"PipboyMenu"sv,
+							RE::UI_MESSAGE_TYPE::kHide);
 					}
 				}
+			}
+
+			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipBckScreenModel"sv))
+			{
+				Renderer->Disable();
+				Renderer->Release();
 			}
 
 			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipboyScreenModel"sv))
@@ -58,6 +67,7 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bUseColorPA", Pipboy::bUseColorPA);
 			GetModSettingBool("Pipboy", "bBackground", Pipboy::bBackground);
 
+			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
 			GetModSettingDouble("Pipboy", "fPipboyViewportLeft", Pipboy::fPipboyViewportLeft);
 			GetModSettingDouble("Pipboy", "fPipboyViewportRight", Pipboy::fPipboyViewportRight);
 			GetModSettingDouble("Pipboy", "fPipboyViewportTop", Pipboy::fPipboyViewportTop);

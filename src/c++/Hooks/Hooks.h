@@ -69,12 +69,86 @@ public:
 	{
 		detail::PipBckScreenModel::Install();
 		detail::PipboyScreenModel::Install();
+
+		if (auto UI = RE::UI::GetSingleton())
+		{
+			UI->RegisterMenu("PipboyBackgroundMenu", detail::PipboyBackgroundMenu::Create);
+		}
 	}
 
 private:
 	class detail
 	{
 	public:
+		class PipboyBackgroundMenu :
+			RE::GameMenuBase
+		{
+		public:
+			PipboyBackgroundMenu()
+			{
+				customRendererName = "PipBckScreenModel";
+
+				menuFlags.set(RE::UI_MENU_FLAGS::kCustomRendering);
+				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
+
+				const auto ScaleformManager = RE::BSScaleformManager::GetSingleton();
+				[[maybe_unused]] const auto LoadMovieSuccess =
+					ScaleformManager->LoadMovieEx(*this, "Interface/PipboyBackgroundMenu.swf", "root.Menu_mc");
+				assert(LoadMovieSuccess);
+
+				filterHolder = RE::msvc::make_unique<RE::BSGFxShaderFXTarget>(*uiMovie, "root.Menu_mc.Background_mc");
+				if (filterHolder)
+				{
+					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 0.0f);
+					shaderFXObjects.push_back(filterHolder.get());
+				}
+			}
+
+			static RE::IMenu* Create(const RE::UIMessage&)
+			{
+				return new PipboyBackgroundMenu();
+			}
+
+			static void ShowMenu()
+			{
+				auto UIMessageQueue = RE::UIMessageQueue::GetSingleton();
+				if (UIMessageQueue)
+				{
+					auto Renderer = PipBckScreenModel::GetRenderer();
+					if (!Renderer)
+					{
+						return;
+					}
+
+					Renderer->MainScreen_SetOpacityAlpha(
+						static_cast<float>(MCM::Settings::Pipboy::fBackgroundAlpha));
+
+					Renderer->Enable();
+					UIMessageQueue->AddMessage(
+						"PipboyBackgroundMenu",
+						RE::UI_MESSAGE_TYPE::kShow);
+				}
+			}
+
+			static void HideMenu()
+			{
+				auto UIMessageQueue = RE::UIMessageQueue::GetSingleton();
+				if (UIMessageQueue)
+				{
+					auto Renderer = PipBckScreenModel::GetRenderer();
+					if (!Renderer)
+					{
+						return;
+					}
+
+					Renderer->Disable();
+					UIMessageQueue->AddMessage(
+						"PipboyBackgroundMenu",
+						RE::UI_MESSAGE_TYPE::kHide);
+				}
+			}
+		};
+
 		class PipBckScreenModel :
 			public RE::BSTEventSink<RE::UIAdvanceMenusFunctionCompleteEvent>
 		{
@@ -189,16 +263,16 @@ private:
 							0.0f,
 							true))
 					{
-						Renderer->MainScreen_SetBackgroundMode(RE::Interface3D::BackgroundMode::kSolidColor);
+						Renderer->MainScreen_SetBackgroundMode(RE::Interface3D::BackgroundMode::kLive);
 						Renderer->MainScreen_SetScreenAttached3D(node);
 
 						Renderer->Offscreen_SetDisplayMode(
 							RE::Interface3D::ScreenMode::kScreenAttached,
-							nullptr,
-							nullptr);
+							"HUDGlassFlat:0",
+							"Materials\\Interface\\HUDGlassFlat.BGEM");
 
 						Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
-						Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kNone);
+						Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kHUDGlass);
 						return Renderer;
 					}
 				}
@@ -323,7 +397,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kPipboy,
+							RE::UI_DEPTH_PRIORITY::kDebug,
 							0.0f,
 							true))
 					{
@@ -941,10 +1015,7 @@ private:
 				case RE::UI_MESSAGE_TYPE::kShow:
 					if (MCM::Settings::Pipboy::bBackground)
 					{
-						if (auto Renderer = detail::PipBckScreenModel::GetRenderer())
-						{
-							Renderer->Enable();
-						}
+						detail::PipboyBackgroundMenu::ShowMenu();
 					}
 
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
@@ -956,10 +1027,7 @@ private:
 				case RE::UI_MESSAGE_TYPE::kHide:
 					if (MCM::Settings::Pipboy::bBackground)
 					{
-						if (auto Renderer = detail::PipBckScreenModel::GetRenderer())
-						{
-							Renderer->Disable();
-						}
+						detail::PipboyBackgroundMenu::HideMenu();
 					}
 
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
