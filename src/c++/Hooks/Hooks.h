@@ -813,6 +813,12 @@ private:
 				return _PlayPipboyLoadHolotapeAnim(a_this, a_holotape, a_noAnim);
 			}
 
+			auto Renderer = detail::PipboyScreenModel::GetRenderer();
+			if (!Renderer || !Renderer->enabled)
+			{
+				return _PlayPipboyLoadHolotapeAnim(a_this, a_holotape, a_noAnim);
+			}
+
 			_PlayPipboyLoadHolotapeAnim(a_this, a_holotape, true);
 		}
 
