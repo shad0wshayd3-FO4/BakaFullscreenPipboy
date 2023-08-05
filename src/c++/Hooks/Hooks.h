@@ -90,12 +90,14 @@ private:
 			{
 				customRendererName = "PipBckScreenModel";
 
-				menuFlags.set(RE::UI_MENU_FLAGS::kCustomRendering);
+				menuFlags.set(
+					RE::UI_MENU_FLAGS::kCustomRendering,
+					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
 				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
 
 				auto State = RE::BSGraphics::State::GetSingleton();
 				auto MoviePath =
-					((State.backBufferWidth / State.backBufferHeight) == (16 / 10))
+					((static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight)) == (16.0 / 10.0))
 						? "Interface\\PipboyBackgroundMenu16x10.swf"sv
 						: "Interface\\PipboyBackgroundMenu.swf"sv;
 
@@ -176,7 +178,7 @@ private:
 
 				auto State = RE::BSGraphics::State::GetSingleton();
 				auto ModelPath =
-					((State.backBufferWidth / State.backBufferHeight) == (16 / 10))
+					((static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight)) == (16.0 / 10.0))
 						? "Interface\\Objects\\HUDGlassFlat16x10.nif"sv
 						: "Interface\\Objects\\HUDGlassFlat.nif"sv;
 
@@ -314,7 +316,7 @@ private:
 
 				auto State = RE::BSGraphics::State::GetSingleton();
 				auto ModelPath =
-					((State.backBufferWidth / State.backBufferHeight) == (16 / 10))
+					((static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight)) == (16.0 / 10.0))
 						? "Interface\\Objects\\HUDGlassFlat16x10.nif"sv
 						: "Interface\\Objects\\HUDGlassFlat.nif"sv;
 
@@ -550,7 +552,7 @@ private:
 		}
 
 	private:
-		static const void EnablePipboyShader(
+		static void EnablePipboyShader(
 			[[maybe_unused]] RE::PipboyManager* a_this)
 		{
 			if (detail::IsExempt())
@@ -585,7 +587,7 @@ private:
 		}
 
 	private:
-		static const void RefreshPipboyRenderSurface(
+		static void RefreshPipboyRenderSurface(
 			[[maybe_unused]] RE::PipboyManager* a_this)
 		{
 			if (detail::IsExempt())
@@ -885,7 +887,7 @@ private:
 		}
 
 	private:
-		static const void PlayPipboyLoadHolotapeAnim(
+		static void PlayPipboyLoadHolotapeAnim(
 			[[maybe_unused]] RE::PipboyManager* a_this,
 			[[maybe_unused]] RE::BGSNote* a_holotape,
 			[[maybe_unused]] bool a_noAnim)
@@ -919,7 +921,7 @@ private:
 		}
 
 	private:
-		static const void LowerPipboy(
+		static void LowerPipboy(
 			[[maybe_unused]] RE::PipboyManager* a_this,
 			[[maybe_unused]] RE::PipboyManager::LOWER_REASON a_reason)
 		{
