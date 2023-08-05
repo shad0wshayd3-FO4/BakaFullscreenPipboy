@@ -72,7 +72,9 @@ public:
 
 		if (auto UI = RE::UI::GetSingleton())
 		{
-			UI->RegisterMenu("PipboyBackgroundMenu", detail::PipboyBackgroundMenu::Create);
+			UI->RegisterMenu(
+				"PipboyBackgroundMenu",
+				detail::PipboyBackgroundMenu::Create);
 		}
 	}
 
@@ -259,7 +261,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kStandard,
+							RE::UI_DEPTH_PRIORITY::kGameMessage,
 							0.0f,
 							true))
 					{
@@ -397,7 +399,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kDebug,
+							RE::UI_DEPTH_PRIORITY::kPauseMenu,
 							0.0f,
 							true))
 					{
