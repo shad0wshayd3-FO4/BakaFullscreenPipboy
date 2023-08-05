@@ -93,9 +93,15 @@ private:
 				menuFlags.set(RE::UI_MENU_FLAGS::kCustomRendering);
 				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
 
+				auto State = RE::BSGraphics::State::GetSingleton();
+				auto MoviePath =
+					((State.backBufferWidth / State.backBufferHeight) == (16 / 10))
+						? "Interface\\PipboyBackgroundMenu16x10.swf"sv
+						: "Interface\\PipboyBackgroundMenu.swf"sv;
+
 				const auto ScaleformManager = RE::BSScaleformManager::GetSingleton();
 				[[maybe_unused]] const auto LoadMovieSuccess =
-					ScaleformManager->LoadMovieEx(*this, "Interface/PipboyBackgroundMenu.swf", "root.Menu_mc");
+					ScaleformManager->LoadMovieEx(*this, MoviePath, "root.Menu_mc");
 				assert(LoadMovieSuccess);
 
 				filterHolder = RE::msvc::make_unique<RE::BSGFxShaderFXTarget>(*uiMovie, "root.Menu_mc.Background_mc");
