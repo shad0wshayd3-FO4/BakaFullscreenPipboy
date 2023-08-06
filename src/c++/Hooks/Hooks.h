@@ -38,11 +38,12 @@ public:
 		hkSetCursorConstraintsRaw<900802, 0x4D>::Install();       // PipboyManager::UpdateCursorConstraint
 		hkSetCursorConstraintsRaw<900802, 0x75>::Install();       // PipboyManager::UpdateCursorConstraint
 		hkQActorInPowerArmor<809076, 0x29, true>::Install();      // PipboyManager::PlayPipboyGenericOpenAnim
+		hkQActorInPowerArmor<726763, 0xC6, true>::Install();      // PipboyManager::RaisePipboy
 		hkQActorInPowerArmorRW<1411297, 0x162>::Install();        // ReadyWeaponHandler::HandleEvent
 		hkPlayPipboyLoadHolotapeAnim<634650, 0x9E>::Install();    // PipboyInventoryMenu::PlayHolotape
 		hkPlayPipboyLoadHolotapeAnim<1411297, 0x1BD>::Install();  // ReadyWeaponHandler::HandleEvent
-																  //		hkLowerPipboy<453340, 0xAC>::Install();                   // ExamineMenu::ShowInspectMenu
-																  //		hkLowerPipboy<43450, 0x247>::Install();                   // BookMenu::OpenBookMenu
+		hkLowerPipboy<453340, 0xAC>::Install();                   // ExamineMenu::ShowInspectMenu
+		hkLowerPipboy<43450, 0x247>::Install();                   // BookMenu::OpenBookMenu
 		hkProcessEvent::Install();                                // PipboyManager::ProcessEvent
 		hkProcessMessage::Install();                              // PipboyMenu::ProcessMessage
 		hkProcessMessageT<RE::PipboyHolotapeMenu>::Install();     // PipboyHolotapeMenu::ProcessMessage
@@ -66,10 +67,9 @@ public:
 		hkStopPipboyMode<731410, 0x96>::Install();                // PipboyManager::ClosedownPipboy
 		hkSetWeaponBonesCulled<1477369, 0xA1>::Install();         // PipboyManager::InitPipboy
 		hkSetWeaponBonesCulled<731410, 0xE3>::Install();          // PipboyManager::ClosedownPipboy
-		hkDoAction<1299608, 0x13A>::Install();                    // PipboyManager::LowerPipboy
+		hkDoAction<1299608, 0x13A>::Install();                    // PipboyManager::OnPipboyOpened
 		hkDoAction<1192694, 0x4C>::Install();                     // PipboyManager::StopExamineMenu
 		hkDoAction<1444875, 0x61>::Install();                     // PipboyManager::LowerPipboy
-		hkDoAction<726763, 0xE4>::Install();                      // PipboyManager::RaisePipboy
 		hkQueueShowPipboy<663900, 0x96>::Install();               // PipboyManager::PlayPipboyOpenAnim
 		hkQueueClosePipboy<273927, 0xB1>::Install();              // PipboyManager::PlayPipboyCloseAnim
 		hkSetEnableDynamicResolution<1231000, 0xF5>::Install();   // PipboyManager::OnPipboyCloseAnim
