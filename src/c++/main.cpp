@@ -40,7 +40,6 @@ namespace
 			case F4SE::MessagingInterface::kGameDataReady:
 				if (static_cast<bool>(a_msg->data))
 				{
-					MCM::Settings::Update();
 					Hooks::InstallPostLoad();
 				}
 				break;

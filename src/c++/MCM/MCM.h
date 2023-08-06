@@ -32,35 +32,8 @@ namespace MCM
 				m_FirstRun = false;
 			}
 
-			if (auto UI = RE::UI::GetSingleton())
-			{
-				if (UI->GetMenuOpen("PipboyMenu"sv))
-				{
-					if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
-					{
-						UIMessageQueue->AddMessage(
-							"PipboyMenu"sv,
-							RE::UI_MESSAGE_TYPE::kHide);
-					}
-				}
-			}
+			ResetStateInit();
 
-			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipBckScreenModel"sv))
-			{
-				Renderer->Disable();
-				Renderer->Release();
-			}
-
-			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipboyScreenModel"sv))
-			{
-				Renderer->Disable();
-				Renderer->Release();
-			}
-
-			m_ini_base.LoadFile("Data/MCM/Config/BakaFullscreenPipboy/settings.ini");
-			m_ini_user.LoadFile("Data/MCM/Settings/BakaFullscreenPipboy.ini");
-
-			// Pipboy
 			GetModSettingBool("Pipboy", "bEnable", Pipboy::bEnable);
 			GetModSettingBool("Pipboy", "bDisableFX", Pipboy::bDisableFX);
 			GetModSettingBool("Pipboy", "bUseColor", Pipboy::bUseColor);
@@ -77,18 +50,50 @@ namespace MCM
 			GetModSettingDouble("Pipboy", "fTerminalViewportTop", Pipboy::fTerminalViewportTop);
 			GetModSettingDouble("Pipboy", "fTerminalViewportBottom", Pipboy::fTerminalViewportBottom);
 
-			if (auto BakaPipboyNoAnims = RE::TESForm::GetFormByEditorID<RE::TESGlobal>("BakaPipboyNoAnims"))
-			{
-				BakaPipboyNoAnims->value = Pipboy::bEnable;
-			}
-
-			m_ini_base.Reset();
-			m_ini_user.Reset();
+			ResetStatePost();
 		}
 
 		inline static bool m_FirstRun{ true };
 
 	private:
+		static void ResetStateInit()
+		{
+			if (auto UI = RE::UI::GetSingleton())
+			{
+				if (UI->GetMenuOpen("PipboyMenu"sv))
+				{
+					if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
+					{
+						UIMessageQueue->AddMessage(
+							"PipboyMenu"sv,
+							RE::UI_MESSAGE_TYPE::kHide);
+					}
+				}
+			}
+
+			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipboyScreenModel"sv))
+			{
+				Renderer->Disable();
+				Renderer->Release();
+			}
+
+			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipboyBackgroundScreenModel"sv))
+			{
+				Renderer->Disable();
+				Renderer->Release();
+			}
+
+			m_ini_base.LoadFile("Data/MCM/Config/BakaFullscreenPipboy/settings.ini");
+			m_ini_user.LoadFile("Data/MCM/Settings/BakaFullscreenPipboy.ini");
+		}
+
+		static void ResetStatePost()
+		{
+			m_ini_base.Reset();
+			m_ini_user.Reset();
+		}
+
+	protected:
 		static void GetModSettingChar(const std::string& a_section, const std::string& a_setting, std::string_view& a_value)
 		{
 			auto base = m_ini_base.GetValue(a_section.c_str(), a_setting.c_str(), a_value.data());
