@@ -38,7 +38,9 @@ public:
 		hkSetCursorConstraintsRaw<900802, 0x4D>::Install();       // PipboyManager::UpdateCursorConstraint
 		hkSetCursorConstraintsRaw<900802, 0x75>::Install();       // PipboyManager::UpdateCursorConstraint
 		hkQActorInPowerArmor<809076, 0x29, true>::Install();      // PipboyManager::PlayPipboyGenericOpenAnim
+		hkQActorInPowerArmorRW<1411297, 0x162>::Install();        // ReadyWeaponHandler::HandleEvent
 		hkPlayPipboyLoadHolotapeAnim<634650, 0x9E>::Install();    // PipboyInventoryMenu::PlayHolotape
+		hkPlayPipboyLoadHolotapeAnim<1411297, 0x1BD>::Install();  // ReadyWeaponHandler::HandleEvent
 //		hkLowerPipboy<453340, 0xAC>::Install();                   // ExamineMenu::ShowInspectMenu
 //		hkLowerPipboy<43450, 0x247>::Install();                   // BookMenu::OpenBookMenu
 		hkProcessEvent::Install();                                // PipboyManager::ProcessEvent
@@ -475,7 +477,7 @@ private:
 			}
 
 			if (MCM::Settings::Pipboy::bUseColorPA
-			    && RE::PowerArmor::ActorInPowerArmor(*RE::PlayerCharacter::GetSingleton()))
+			    && RE::PowerArmor::PlayerInPowerArmor())
 			{
 				a_menu->filterHolder->CreateAndSetFiltersToHUD(RE::HUDColorTypes::kPowerArmorColorOnly);
 			}
@@ -857,6 +859,41 @@ private:
 	};
 
 	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkQActorInPowerArmorRW
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_QActorInPowerArmor = trampoline.write_call<5>(target.address(), QActorInPowerArmor);
+		}
+
+	private:
+		static bool QActorInPowerArmor(
+			[[maybe_unused]] RE::Actor* a_actor)
+		{
+			if (detail::IsExempt())
+			{
+				return _QActorInPowerArmor(a_actor);
+			}
+
+			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
+			{
+				if (PlayerCamera->currentState
+					&& PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				{
+					return true;
+				}
+			}
+
+			return _QActorInPowerArmor(a_actor);
+		}
+
+		inline static REL::Relocation<decltype(&hkQActorInPowerArmorRW::QActorInPowerArmor)> _QActorInPowerArmor;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkPlayPipboyLoadHolotapeAnim
 	{
 	public:
@@ -876,6 +913,20 @@ private:
 			if (detail::IsExempt())
 			{
 				return _PlayPipboyLoadHolotapeAnim(a_this, a_holotape, a_noAnim);
+			}
+
+			if (RE::PowerArmor::PlayerInPowerArmor())
+			{
+				return _PlayPipboyLoadHolotapeAnim(a_this, a_holotape, true);
+			}
+
+			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
+			{
+				if (PlayerCamera->currentState
+				    && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				{
+					return _PlayPipboyLoadHolotapeAnim(a_this, a_holotape, true);
+				}
 			}
 
 			auto Renderer = detail::PipboyScreenModel::GetRenderer();
@@ -1174,7 +1225,7 @@ private:
 					a_this->closeAnimEvent = "ForceClose"sv;
 					a_this->OnPipboyCloseAnim();
 				}
-				else if (RE::PowerArmor::ActorInPowerArmor(*RE::PlayerCharacter::GetSingleton()))
+				else if (RE::PowerArmor::PlayerInPowerArmor())
 				{
 					a_this->closeAnimEvent = "PowerArmorClose"sv;
 					a_this->OnPipboyCloseAnim();
