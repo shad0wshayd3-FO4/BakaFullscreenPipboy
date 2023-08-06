@@ -41,8 +41,8 @@ public:
 		hkQActorInPowerArmorRW<1411297, 0x162>::Install();        // ReadyWeaponHandler::HandleEvent
 		hkPlayPipboyLoadHolotapeAnim<634650, 0x9E>::Install();    // PipboyInventoryMenu::PlayHolotape
 		hkPlayPipboyLoadHolotapeAnim<1411297, 0x1BD>::Install();  // ReadyWeaponHandler::HandleEvent
-//		hkLowerPipboy<453340, 0xAC>::Install();                   // ExamineMenu::ShowInspectMenu
-//		hkLowerPipboy<43450, 0x247>::Install();                   // BookMenu::OpenBookMenu
+																  //		hkLowerPipboy<453340, 0xAC>::Install();                   // ExamineMenu::ShowInspectMenu
+																  //		hkLowerPipboy<43450, 0x247>::Install();                   // BookMenu::OpenBookMenu
 		hkProcessEvent::Install();                                // PipboyManager::ProcessEvent
 		hkProcessMessage::Install();                              // PipboyMenu::ProcessMessage
 		hkProcessMessageT<RE::PipboyHolotapeMenu>::Install();     // PipboyHolotapeMenu::ProcessMessage
@@ -881,7 +881,7 @@ private:
 			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
 			{
 				if (PlayerCamera->currentState
-					&& PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				    && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
 				{
 					return true;
 				}
