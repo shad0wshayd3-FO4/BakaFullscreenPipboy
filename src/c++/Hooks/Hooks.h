@@ -38,6 +38,7 @@ public:
 		hkSetCursorConstraintsRaw<900802, 0x4D>::Install();       // PipboyManager::UpdateCursorConstraint
 		hkSetCursorConstraintsRaw<900802, 0x75>::Install();       // PipboyManager::UpdateCursorConstraint
 		hkQActorInPowerArmor<809076, 0x29, true>::Install();      // PipboyManager::PlayPipboyGenericOpenAnim
+		hkQActorInPowerArmor<1444875, 0x46, true>::Install();     // PipboyManager::LowerPipboy
 		hkQActorInPowerArmor<726763, 0xC6, true>::Install();      // PipboyManager::RaisePipboy
 		hkQActorInPowerArmorRW<1411297, 0x162>::Install();        // ReadyWeaponHandler::HandleEvent
 		hkPlayPipboyLoadHolotapeAnim<634650, 0x9E>::Install();    // PipboyInventoryMenu::PlayHolotape
