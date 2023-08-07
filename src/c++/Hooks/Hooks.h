@@ -45,7 +45,6 @@ public:
 		hkLowerPipboy<453340, 0xAC>::Install();                   // ExamineMenu::ShowInspectMenu
 		hkLowerPipboy<43450, 0x247>::Install();                   // BookMenu::OpenBookMenu
 		hkProcessEvent::Install();                                // PipboyManager::ProcessEvent
-		hkProcessMessage::Install();                              // PipboyMenu::ProcessMessage
 		hkProcessMessageT<RE::PipboyHolotapeMenu>::Install();     // PipboyHolotapeMenu::ProcessMessage
 
 		hkPlayPipboyOpenAnim<943894, 0x134>::Install();           // UseItemCommand::DoExecute
@@ -1307,51 +1306,6 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&ProcessEvent)> _ProcessEvent;
-	};
-
-	class hkProcessMessage
-	{
-	public:
-		static void Install()
-		{
-			static REL::Relocation<std::uintptr_t> target{ RE::PipboyMenu::VTABLE[0] };
-			_ProcessMessage = target.write_vfunc(0x03, reinterpret_cast<std::uintptr_t>(ProcessMessage));
-		}
-
-	private:
-		static RE::UI_MESSAGE_RESULTS ProcessMessage(
-			[[maybe_unused]] RE::IMenu* a_this,
-			[[maybe_unused]] RE::UIMessage& a_message)
-		{
-			if (detail::IsExempt())
-			{
-				return _ProcessMessage(a_this, a_message);
-			}
-
-			switch (a_message.type.get())
-			{
-				case RE::UI_MESSAGE_TYPE::kShow:
-					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
-					{
-						Renderer->Enable();
-					}
-					break;
-
-				case RE::UI_MESSAGE_TYPE::kHide:
-					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
-					{
-						Renderer->Disable();
-					}
-					break;
-
-				default:
-					break;
-			}
-
-			return _ProcessMessage(a_this, a_message);
-		}
-
-		inline static REL::Relocation<decltype(&ProcessMessage)> _ProcessMessage;
 	};
 
 	template<class T>
