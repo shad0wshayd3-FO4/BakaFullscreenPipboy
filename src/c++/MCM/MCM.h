@@ -9,6 +9,7 @@ namespace MCM
 		{
 		public:
 			inline static bool bEnable{ true };
+			inline static bool bQuickBoyKey{ false };
 			inline static bool bDisableFX{ true };
 			inline static bool bUseColor{ true };
 			inline static bool bUseColorPA{ true };
@@ -23,6 +24,10 @@ namespace MCM
 			inline static double fTerminalViewportRight{ 0.82 };
 			inline static double fTerminalViewportTop{ 0.0 };
 			inline static double fTerminalViewportBottom{ 0.92 };
+
+			inline static double fPipboy3DItemScale{ 0.5 };
+			inline static double fPipboy3DItemScreenPosX{ 0.70 };
+			inline static double fPipboy3DItemScreenPosY{ 0.40 };
 		};
 
 		class Runtime
@@ -44,6 +49,7 @@ namespace MCM
 			ResetStateInit();
 
 			GetModSettingBool("Pipboy", "bEnable", Pipboy::bEnable);
+			GetModSettingBool("Pipboy", "bQuickBoyKey", Pipboy::bQuickBoyKey);
 			GetModSettingBool("Pipboy", "bDisableFX", Pipboy::bDisableFX);
 			GetModSettingBool("Pipboy", "bUseColor", Pipboy::bUseColor);
 			GetModSettingBool("Pipboy", "bUseColorPA", Pipboy::bUseColorPA);
@@ -58,6 +64,10 @@ namespace MCM
 			GetModSettingDouble("Pipboy", "fTerminalViewportRight", Pipboy::fTerminalViewportRight);
 			GetModSettingDouble("Pipboy", "fTerminalViewportTop", Pipboy::fTerminalViewportTop);
 			GetModSettingDouble("Pipboy", "fTerminalViewportBottom", Pipboy::fTerminalViewportBottom);
+
+			GetModSettingDouble("Pipboy", "fPipboy3DItemScale", Pipboy::fPipboy3DItemScale);
+			GetModSettingDouble("Pipboy", "fPipboy3DItemScreenPosX", Pipboy::fPipboy3DItemScreenPosX);
+			GetModSettingDouble("Pipboy", "fPipboy3DItemScreenPosY", Pipboy::fPipboy3DItemScreenPosY);
 
 			HandleKeybinds();
 			ResetStatePost();

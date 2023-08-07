@@ -77,6 +77,8 @@ public:
 		hkSetEnableDynamicResolution<1477369, 0x275>::Install();  // PipboyManager::InitPipboy
 		hkStopAnimationGraphListening<731410, 0xA6>::Install();   // PipboyManager::ClosedownPipboy
 		hkOnButtonEvent::Install();                               // PipboyMenu::OnButtonEvent
+		hkSetModelScale<1477369, 0x1D7>::Install();               // PipboyManager::InitPipboy
+		hkSetModelScreenPosition<1477369, 0x1B2>::Install();      // PipboyManager::InitPipboy
 	}
 
 	static void InstallPostLoad()
@@ -91,6 +93,9 @@ public:
 			UI->RegisterMenu(
 				"PipboyBackgroundMenu",
 				detail::PipboyBackgroundMenu::Create);
+			UI->RegisterMenu(
+				"PipboyBackgroundMenuPA",
+				detail::PipboyBackgroundMenuPA::Create);
 		}
 	}
 
@@ -106,8 +111,6 @@ public:
 			return;
 		}
 
-		RE::SendHUDMessage::ShowHUDMessage("QuickBoy", nullptr, false, false);
-
 		auto UI = RE::UI::GetSingleton();
 		if (!UI)
 		{
@@ -121,7 +124,6 @@ public:
 		
 		if (MCM::Settings::Runtime::bQuickBoy)
 		{
-			detail::PipboyBackgroundMenu::HideMenu();
 			if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 			{
 				Renderer->Disable();
@@ -141,7 +143,6 @@ public:
 		}
 		else
 		{
-			detail::PipboyBackgroundMenu::ShowMenu();
 			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipboyMenu"sv))
 			{
 				Renderer->Disable();
@@ -163,27 +164,38 @@ public:
 
 			if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 			{
-				auto PipboyMenu = UI->GetMenu<RE::PipboyMenu>();
-
-				PipboyMenu->customRendererName = detail::PipboyScreenModel::GetRendererName();
-				if (auto PipboyManager = RE::PipboyManager::GetSingleton())
+				if (auto PipboyMenu = UI->GetMenu<RE::PipboyMenu>())
 				{
-					PipboyManager->inv3DModelManager.End3D();
+					PipboyMenu->customRendererName = detail::PipboyScreenModel::GetRendererName();
+					if (auto PipboyManager = RE::PipboyManager::GetSingleton())
+					{
+						PipboyManager->inv3DModelManager.DisableRendering("InventoryMenu"sv);
+						PipboyManager->inv3DModelManager.str3DRendererName = detail::PipboyScreenModel::GetRendererName();
+						PipboyManager->inv3DModelManager.SetModelScale(
+							static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScale));
+						PipboyManager->inv3DModelManager.SetModelScreenPosition(
+							{ static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosX),
+						      static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosY),
+						      1.0f },
+							true);
+						PipboyManager->inv3DModelManager.EnableRendering("InventoryMenu"sv);
+						PipboyManager->UpdateCursorConstraint(false);
+					}
+
+					if (MCM::Settings::Pipboy::bDisableFX
+					    && MCM::Settings::Pipboy::bUseColor)
+					{
+						detail::SetColorHelper(PipboyMenu.get());
+					}
+
+					PipboyMenu->SetViewportRect(
+						{ static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
+					      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
+					      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
+					      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom) });
+
+					Renderer->Enable();
 				}
-
-				if (MCM::Settings::Pipboy::bDisableFX
-				    && MCM::Settings::Pipboy::bUseColor)
-				{
-					detail::SetColorHelper(PipboyMenu.get());
-				}
-
-				PipboyMenu->SetViewportRect(
-					{ static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
-				      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
-				      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
-				      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom) });
-
-				Renderer->Enable();
 			}
 		}
 	}
@@ -330,7 +342,8 @@ private:
 			inline static PipboyScreenModel* singleton{ nullptr };
 		};
 
-		class PipboyBackgroundScreenModel
+		class PipboyBackgroundScreenModel :
+			public RE::BSTEventSink<RE::UIAdvanceMenusFunctionCompleteEvent>
 		{
 		public:
 			PipboyBackgroundScreenModel()
@@ -359,10 +372,20 @@ private:
 					args);
 				CreateRenderer();
 				RE::NiTexture::SetAllowDegrade(true);
+
+				if (auto EventSource = RE::UIAdvanceMenusFunctionCompleteEvent::GetEventSource())
+				{
+					EventSource->RegisterSink(this);
+				}
 			}
 
 			virtual ~PipboyBackgroundScreenModel()
 			{
+				if (auto EventSource = RE::UIAdvanceMenusFunctionCompleteEvent::GetEventSource())
+				{
+					EventSource->UnregisterSink(this);
+				}
+
 				if (auto Renderer = GetRenderer())
 				{
 					Renderer->Disable();
@@ -403,6 +426,37 @@ private:
 					return Renderer;
 				}
 				return PipboyBackgroundScreenModel::GetSingleton()->CreateRenderer();
+			}
+
+			virtual RE::BSEventNotifyControl ProcessEvent(const RE::UIAdvanceMenusFunctionCompleteEvent&, RE::BSTEventSource<RE::UIAdvanceMenusFunctionCompleteEvent>*) override
+			{
+				if (!MCM::Settings::QQuickBoy())
+				{
+					return RE::BSEventNotifyControl::kContinue;
+				}
+
+				if (!MCM::Settings::Pipboy::bBackground)
+				{
+					return RE::BSEventNotifyControl::kContinue;
+				}
+
+				auto Renderer = GetRenderer();
+				if (Renderer->enabled != PipboyScreenModel::GetRenderer()->enabled)
+				{
+					Renderer->enabled = !Renderer->enabled;
+					if (Renderer->enabled)
+					{
+						Renderer->MainScreen_SetOpacityAlpha(
+							static_cast<float>(MCM::Settings::Pipboy::fBackgroundAlpha));
+						PipboyBackgroundMenu::ShowMenu();
+					}
+					else
+					{
+						PipboyBackgroundMenu::HideMenu();
+					}
+				}
+
+				return RE::BSEventNotifyControl::kContinue;
 			}
 
 			F4_HEAP_REDEFINE_NEW();
@@ -452,7 +506,7 @@ private:
 		};
 
 		class PipboyBackgroundMenu :
-			RE::GameMenuBase
+			public RE::GameMenuBase
 		{
 		public:
 			PipboyBackgroundMenu()
@@ -462,6 +516,7 @@ private:
 				menuFlags.set(
 					RE::UI_MENU_FLAGS::kCustomRendering,
 					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
+				menuHUDMode = "Pipboy";
 				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
 
 				auto State = RE::BSGraphics::State::GetSingleton();
@@ -495,21 +550,13 @@ private:
 					return;
 				}
 
-				auto UIMessageQueue = RE::UIMessageQueue::GetSingleton();
-				if (UIMessageQueue)
+				if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 				{
-					auto Renderer = PipboyBackgroundScreenModel::GetRenderer();
-					if (!Renderer)
-					{
-						return;
-					}
-
-					Renderer->MainScreen_SetOpacityAlpha(
-						static_cast<float>(MCM::Settings::Pipboy::fBackgroundAlpha));
-
-					Renderer->Enable();
 					UIMessageQueue->AddMessage(
 						"PipboyBackgroundMenu",
+						RE::UI_MESSAGE_TYPE::kShow);
+					UIMessageQueue->AddMessage(
+						"PipboyBackgroundMenuPA",
 						RE::UI_MESSAGE_TYPE::kShow);
 				}
 			}
@@ -521,20 +568,26 @@ private:
 					return;
 				}
 
-				auto UIMessageQueue = RE::UIMessageQueue::GetSingleton();
-				if (UIMessageQueue)
+				if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 				{
-					auto Renderer = PipboyBackgroundScreenModel::GetRenderer();
-					if (!Renderer)
-					{
-						return;
-					}
-
-					Renderer->Disable();
 					UIMessageQueue->AddMessage(
 						"PipboyBackgroundMenu",
 						RE::UI_MESSAGE_TYPE::kHide);
+					UIMessageQueue->AddMessage(
+						"PipboyBackgroundMenuPA",
+						RE::UI_MESSAGE_TYPE::kHide);
 				}
+			}
+		};
+
+		class PipboyBackgroundMenuPA :
+			public PipboyBackgroundMenu
+		{
+		public:
+			PipboyBackgroundMenuPA() :
+				PipboyBackgroundMenu()
+			{
+				menuHUDMode = "PowerArmor";
 			}
 		};
 
@@ -563,16 +616,41 @@ private:
 						MCM::Settings::Runtime::bQuickBoy = false;
 						if (auto PipboyManager = RE::PipboyManager::GetSingleton())
 						{
+							PipboyManager->inv3DModelManager.DisableRendering("InventoryMenu"sv);
+							PipboyManager->inv3DModelManager.str3DRendererName = "PipboyMenu"sv;
+							if (RE::PowerArmor::PlayerInPowerArmor())
+							{
+								PipboyManager->inv3DModelManager.SetModelScale(setting::fPipboy3DItemPAScale->GetFloat());
+								PipboyManager->inv3DModelManager.SetModelScreenPosition(
+									{ setting::fPipboy3DItemPAScreenPosX->GetFloat(),
+								      setting::fPipboy3DItemPAScreenPosY->GetFloat(),
+								      1.0f },
+									true);
+							}
+							else
+							{
+								PipboyManager->inv3DModelManager.SetModelScale(setting::fPipboy3DItemPAScale->GetFloat());
+								PipboyManager->inv3DModelManager.SetModelScreenPosition(
+									{ setting::fPipboy3DItemScreenPosX->GetFloat(),
+								      setting::fPipboy3DItemScreenPosY->GetFloat(),
+								      1.0f },
+									true);
+							}
+							PipboyManager->inv3DModelManager.EnableRendering("InventoryMenu"sv);
+
+							PipboyManager->UpdateCursorConstraint(true);
 							PipboyManager->EnablePipboyShader();
+
 							if (auto UI = RE::UI::GetSingleton())
 							{
-								auto PipboyMenu = UI->GetMenu<RE::PipboyMenu>();
-								PipboyManager->AddMenuToPipboy(
-									*PipboyMenu,
-									{ 0, 1.0f, 0, 1.0f },
-									{ 0, 1.0f, 0, 1.0f });
-								PipboyManager->inv3DModelManager.End3D();
-								PipboyManager->StartAnimationGraphListening();
+								if (auto PipboyMenu = UI->GetMenu<RE::PipboyMenu>())
+								{
+									PipboyManager->AddMenuToPipboy(
+										*PipboyMenu,
+										{ 0.0375f, 0.9625f, 0, 1.0f },
+										{ 0, 1.0f, 0.15f, 0.85f });
+									PipboyManager->StartAnimationGraphListening();
+								}
 							}
 						}
 
@@ -701,6 +779,17 @@ private:
 				a_menu->filterHolder->CreateAndSetFiltersToColor(PipboyColorR, PipboyColorG, PipboyColorB, 1.0);
 			}
 		}
+	};
+
+	class setting
+	{
+	public:
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemScreenPosX{ REL::ID(858699) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemScreenPosY{ REL::ID(1517083) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemScale{ REL::ID(592946) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemPAScreenPosX{ REL::ID(1251037) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemPAScreenPosY{ REL::ID(326697) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemPAScale{ REL::ID(984624) };
 	};
 
 	template<std::uint64_t ID, std::ptrdiff_t OFF>
@@ -1244,7 +1333,6 @@ private:
 				case RE::UI_MESSAGE_TYPE::kShow:
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 					{
-						detail::PipboyBackgroundMenu::ShowMenu();
 						Renderer->Enable();
 					}
 					break;
@@ -1252,7 +1340,6 @@ private:
 				case RE::UI_MESSAGE_TYPE::kHide:
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 					{
-						detail::PipboyBackgroundMenu::HideMenu();
 						Renderer->Disable();
 					}
 					break;
@@ -1712,6 +1799,11 @@ private:
 			[[maybe_unused]] RE::IMenu* a_this,
 			[[maybe_unused]] const RE::ButtonEvent* a_event)
 		{
+			if (!MCM::Settings::Pipboy::bQuickBoyKey)
+			{
+				return _OnButtonEvent(a_this, a_event);
+			}
+
 			if (a_event->QJustPressed()
 			    && (a_event->idCode == MCM::Settings::Runtime::QuickBoyKey))
 			{
@@ -1726,6 +1818,66 @@ private:
 		inline static REL::Relocation<decltype(&OnButtonEvent)> _OnButtonEvent;
 	};
 
-	class hkSetModelScreenPosition;
-	class hkSetModelScale;
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkSetModelScale
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_SetModelScale = trampoline.write_call<5>(target.address(), SetModelScale);
+		}
+
+	private:
+		static void SetModelScale(
+			[[maybe_unused]] RE::Inventory3DManager* a_this,
+			[[maybe_unused]] float a_scale)
+		{
+			if (detail::IsExempt())
+			{
+				return _SetModelScale(a_this, a_scale);
+			}
+
+			return _SetModelScale(
+				a_this,
+				static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScale));
+		}
+
+		inline static REL::Relocation<decltype(&hkSetModelScale::SetModelScale)> _SetModelScale;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkSetModelScreenPosition
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_SetModelScreenPosition = trampoline.write_call<5>(target.address(), SetModelScreenPosition);
+		}
+
+	private:
+		static void SetModelScreenPosition(
+			[[maybe_unused]] RE::Inventory3DManager* a_this,
+			[[maybe_unused]] const RE::NiPoint3& a_position,
+			[[maybe_unused]] bool a_screenCoords)
+		{
+			if (detail::IsExempt())
+			{
+				return _SetModelScreenPosition(a_this, a_position, a_screenCoords);
+			}
+
+			RE::NiPoint3 ScreenPosition{
+				static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosX),
+				static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosY),
+				1.0f,
+			};
+
+			return _SetModelScreenPosition(a_this, ScreenPosition, a_screenCoords);
+		}
+
+		inline static REL::Relocation<decltype(&hkSetModelScreenPosition::SetModelScreenPosition)> _SetModelScreenPosition;
+	};
 };
