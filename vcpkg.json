@@ -8,6 +8,7 @@
     "autotoml",
     "boost-stl-interfaces",
     "fmt",
+    "nlohmann-json",
     "rsm-mmio",
     "simpleini",
     "spdlog",

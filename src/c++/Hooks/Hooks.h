@@ -92,6 +92,26 @@ public:
 		}
 	}
 
+	static void ToggleQuickBoy()
+	{
+		if (auto PlayerControls = RE::PlayerControls::GetSingleton())
+		{
+			QuickBoyAnimationHandler::Register(true);
+			if (!MCM::Settings::Runtime::bQuickBoy)
+			{
+				PlayerControls->DoAction(
+					RE::DEFAULT_OBJECT::kActionPipboy,
+					RE::ActionInput::ACTIONPRIORITY::kTry);
+			}
+			else
+			{
+				PlayerControls->DoAction(
+					RE::DEFAULT_OBJECT::kActionPipboyClose,
+					RE::ActionInput::ACTIONPRIORITY::kTry);
+			}
+		}
+	}
+
 private:
 	class detail
 	{
@@ -436,7 +456,7 @@ private:
 		{
 			if (auto PipboyManager = RE::PipboyManager::GetSingleton())
 			{
-				if (!MCM::Settings::Pipboy::bEnable
+				if (!MCM::Settings::QQuickBoy()
 				    || PipboyManager->menuToOpen == "GenericMenu"sv
 				    || PipboyManager->menuToOpen == "PipboyOpeningSequenceMenu"sv)
 				{
@@ -500,8 +520,77 @@ private:
 				a_menu->filterHolder->CreateAndSetFiltersToColor(PipboyColorR, PipboyColorG, PipboyColorB, 1.0);
 			}
 		}
+	};
 
-		inline static bool bPlayCloseAnim{ false };
+	class QuickBoyAnimationHandler :
+		RE::BSTEventSink<RE::BSAnimationGraphEvent>
+	{
+	public:
+		static void Register(bool a_register)
+		{
+			PipboyAnim::Register(a_register);
+		}
+
+		[[nodiscard]] static QuickBoyAnimationHandler* GetSingleton()
+		{
+			static QuickBoyAnimationHandler singleton;
+			return std::addressof(singleton);
+		}
+
+		virtual RE::BSEventNotifyControl ProcessEvent(const RE::BSAnimationGraphEvent& a_event, RE::BSTEventSource<RE::BSAnimationGraphEvent>*) override
+		{
+			logger::info("Recieved Event: {:s}"sv, a_event.tag.c_str());
+			return RE::BSEventNotifyControl::kContinue;
+		}
+
+	private:
+		class PipboyAnim
+		{
+		public:
+			static void Register(bool a_register)
+			{
+				if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton())
+				{
+					RE::BSTSmartPointer<RE::BSAnimationGraphManager> Manager;
+					if (PlayerCharacter->GetAnimationGraphManagerImpl(Manager))
+					{
+						auto functor = functor_t{ a_register };
+						ForEachAnimationGraph(Manager.get(), functor);
+					}
+				}
+			}
+
+		private:
+			// clang-format off
+			struct functor_t
+			{
+			public:
+				functor_t(bool a_listen, bool a_third = true) : listen(a_listen), third(a_third) {
+					sink = QuickBoyAnimationHandler::GetSingleton();
+				}
+
+				bool operator()(const RE::BSTSmartPointer<RE::BShkbAnimationGraph>& a_graph)
+				{
+					using func_t = bool(functor_t::*)(const RE::BSTSmartPointer<RE::BShkbAnimationGraph>&);
+					REL::Relocation<func_t> func{ REL::ID(348781) };
+					return func(this, a_graph);
+				}
+
+				// members
+				void* sink;   // 00
+				bool listen;  // 08
+				bool third;   // 09
+			};
+			static_assert(sizeof(functor_t) == 0x10);
+			// clang-format on
+
+			static void ForEachAnimationGraph(RE::BSAnimationGraphManager* a_this, functor_t& a_functor)
+			{
+				using func_t = decltype(&ForEachAnimationGraph);
+				REL::Relocation<func_t> func{ REL::ID(684075) };
+				return func(a_this, a_functor);
+			}
+		};
 	};
 
 	template<std::uint64_t ID, std::ptrdiff_t OFF>
@@ -995,11 +1084,11 @@ private:
 				return _ProcessEvent(a_this, a_event, a_source);
 			}
 
-			if (detail::bPlayCloseAnim
-			    && (a_event.animEvent == a_this->openAnimEvent
-			        || a_event.animEvent == "holotapeLoaded"sv))
+			if (MCM::Settings::Runtime::bPlayClose
+			    && (a_event.tag == a_this->openAnimEvent
+			        || a_event.tag == "holotapeLoaded"sv))
 			{
-				detail::bPlayCloseAnim = false;
+				MCM::Settings::Runtime::bPlayClose = false;
 				if (auto PlayerControls = RE::PlayerControls::GetSingleton())
 				{
 					PlayerControls->DoAction(
@@ -1185,7 +1274,7 @@ private:
 
 			if (detail::IsAnimOverride())
 			{
-				detail::bPlayCloseAnim = true;
+				MCM::Settings::Runtime::bPlayClose = true;
 				a_this->StartAnimationGraphListening();
 			}
 
@@ -1451,7 +1540,7 @@ private:
 				return _StopAnimationGraphListening(a_this);
 			}
 
-			if (detail::bPlayCloseAnim)
+			if (MCM::Settings::Runtime::bPlayClose)
 			{
 				return;
 			}

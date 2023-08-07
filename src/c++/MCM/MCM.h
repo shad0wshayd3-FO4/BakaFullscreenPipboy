@@ -25,6 +25,14 @@ namespace MCM
 			inline static double fTerminalViewportBottom{ 0.92 };
 		};
 
+		class Runtime
+		{
+		public:
+			inline static bool bQuickBoy{ false };
+			inline static bool bPlayClose{ false };
+			inline static RE::BS_BUTTON_CODE QuickBoyKey{ 0 };
+		};
+
 		static void Update()
 		{
 			if (m_FirstRun)
@@ -50,7 +58,13 @@ namespace MCM
 			GetModSettingDouble("Pipboy", "fTerminalViewportTop", Pipboy::fTerminalViewportTop);
 			GetModSettingDouble("Pipboy", "fTerminalViewportBottom", Pipboy::fTerminalViewportBottom);
 
+			HandleKeybinds();
 			ResetStatePost();
+		}
+
+		static bool QQuickBoy()
+		{
+			return (MCM::Settings::Pipboy::bEnable && MCM::Settings::Runtime::bQuickBoy);
 		}
 
 		inline static bool m_FirstRun{ true };
@@ -91,6 +105,24 @@ namespace MCM
 		{
 			m_ini_base.Reset();
 			m_ini_user.Reset();
+		}
+
+		static void HandleKeybinds()
+		{
+			std::ifstream fstream{ "Data/MCM/Settings/Keybinds.json" };
+			nlohmann::json data =
+				nlohmann::json::parse(fstream);
+			fstream.close();
+
+			for (auto& iter : data["keybinds"sv])
+			{
+				if (iter["id"sv] == "ToggleQuickBoy"
+				    && iter["modName"sv] == "BakaFullscreenPipboy")
+				{
+					Runtime::QuickBoyKey = iter["keycode"sv];
+					break;
+				}
+			}
 		}
 
 	protected:
