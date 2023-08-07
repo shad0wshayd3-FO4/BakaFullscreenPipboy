@@ -78,6 +78,7 @@ public:
 		hkOnButtonEvent::Install();                               // PipboyMenu::OnButtonEvent
 		hkSetModelScale<1477369, 0x1D7>::Install();               // PipboyManager::InitPipboy
 		hkSetModelScreenPosition<1477369, 0x1B2>::Install();      // PipboyManager::InitPipboy
+		hkKillScreenEffects<643948, 0x6B>::Install();             // PipboyMenu::ProcessMessage
 	}
 
 	static void InstallPostLoad()
@@ -844,7 +845,11 @@ private:
 			}
 
 			a_this->inv3DModelManager.str3DRendererName = detail::PipboyScreenModel::GetRendererName();
-			RE::ImageSpaceModifierInstanceForm::Trigger("PipboyMenuImod"sv);
+
+			if (MCM::Settings::Pipboy::bBackgroundBlur)
+			{
+				RE::ImageSpaceModifierInstanceForm::Trigger("PipboyMenuImod"sv);
+			}
 
 			if (auto PowerArmor = RE::PowerArmorGeometry::GetSingleton())
 			{
@@ -878,7 +883,10 @@ private:
 				return _RefreshPipboyRenderSurface(a_this);
 			}
 
-			RE::ImageSpaceModifierInstanceForm::Trigger("PipboyMenuImod"sv);
+			if (MCM::Settings::Pipboy::bBackgroundBlur)
+			{
+				RE::ImageSpaceModifierInstanceForm::Trigger("PipboyMenuImod"sv);
+			}
 		}
 
 		inline static REL::Relocation<decltype(&hkRefreshPipboyRenderSurface::RefreshPipboyRenderSurface)> _RefreshPipboyRenderSurface;
@@ -1834,5 +1842,35 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&hkSetModelScreenPosition::SetModelScreenPosition)> _SetModelScreenPosition;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkKillScreenEffects
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_KillScreenEffects = trampoline.write_call<5>(target.address(), KillScreenEffects);
+		}
+
+	private:
+		static void KillScreenEffects()
+		{
+			if (detail::IsExempt())
+			{
+				return _KillScreenEffects();
+			}
+
+			if (MCM::Settings::Pipboy::bKeepLowHealthIMod)
+			{
+				return;
+			}
+
+			return _KillScreenEffects();
+		}
+
+		inline static REL::Relocation<decltype(&hkKillScreenEffects::KillScreenEffects)> _KillScreenEffects;
 	};
 };

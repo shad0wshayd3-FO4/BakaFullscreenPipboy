@@ -14,6 +14,8 @@ namespace MCM
 			inline static bool bUseColor{ true };
 			inline static bool bUseColorPA{ true };
 			inline static bool bBackground{ false };
+			inline static bool bBackgroundBlur{ true };
+			inline static bool bKeepLowHealthIMod{ false };
 
 			inline static double fBackgroundAlpha{ 1.0 };
 			inline static double fPipboyViewportLeft{ 0.0 };
@@ -25,9 +27,9 @@ namespace MCM
 			inline static double fTerminalViewportTop{ 0.0 };
 			inline static double fTerminalViewportBottom{ 0.92 };
 
-			inline static double fPipboy3DItemScale{ 0.5 };
-			inline static double fPipboy3DItemScreenPosX{ 0.70 };
-			inline static double fPipboy3DItemScreenPosY{ 0.40 };
+			inline static double fPipboy3DItemScale{ 0.6 };
+			inline static double fPipboy3DItemScreenPosX{ 0.68 };
+			inline static double fPipboy3DItemScreenPosY{ 0.28 };
 		};
 
 		class Runtime
@@ -54,6 +56,8 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bUseColor", Pipboy::bUseColor);
 			GetModSettingBool("Pipboy", "bUseColorPA", Pipboy::bUseColorPA);
 			GetModSettingBool("Pipboy", "bBackground", Pipboy::bBackground);
+			GetModSettingBool("Pipboy", "bBackgroundBlur", Pipboy::bBackgroundBlur);
+			GetModSettingBool("Pipboy", "bKeepLowHealthIMod", Pipboy::bKeepLowHealthIMod);
 
 			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
 			GetModSettingDouble("Pipboy", "fPipboyViewportLeft", Pipboy::fPipboyViewportLeft);
