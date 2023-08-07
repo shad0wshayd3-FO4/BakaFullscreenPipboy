@@ -120,7 +120,7 @@ public:
 		{
 			return;
 		}
-		
+
 		if (MCM::Settings::Runtime::bQuickBoy)
 		{
 			if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
@@ -699,6 +699,7 @@ private:
 					bool third;   // 09
 				};
 				static_assert(sizeof(functor_t) == 0x10);
+
 				// clang-format on
 
 				static void ForEachAnimationGraph(RE::BSAnimationGraphManager* a_this, functor_t& a_functor)
