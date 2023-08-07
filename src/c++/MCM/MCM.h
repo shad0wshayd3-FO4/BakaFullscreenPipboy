@@ -124,19 +124,27 @@ namespace MCM
 
 		static void HandleKeybinds()
 		{
-			std::ifstream fstream{ "Data/MCM/Settings/Keybinds.json" };
-			nlohmann::json data =
-				nlohmann::json::parse(fstream);
-			fstream.close();
-
-			for (auto& iter : data["keybinds"sv])
+			try
 			{
-				if (iter["id"sv] == "ToggleQuickBoy"
-				    && iter["modName"sv] == "BakaFullscreenPipboy")
+				std::ifstream fstream{ "Data/MCM/Settings/Keybinds.json" };
+				nlohmann::json data =
+					nlohmann::json::parse(fstream);
+				fstream.close();
+
+				for (auto& iter : data["keybinds"sv])
 				{
-					Runtime::QuickBoyKey = iter["keycode"sv];
-					break;
+					if (iter["id"sv] == "ToggleQuickBoy"
+						&& iter["modName"sv] == "BakaFullscreenPipboy")
+					{
+						Runtime::QuickBoyKey = iter["keycode"sv];
+						break;
+					}
 				}
+			}
+			catch (std::exception& a_exception)
+			{
+				Runtime::QuickBoyKey = 0;
+				logger::debug("{:s}"sv, a_exception.what());
 			}
 		}
 
