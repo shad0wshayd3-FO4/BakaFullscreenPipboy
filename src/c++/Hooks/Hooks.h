@@ -79,6 +79,7 @@ public:
 		hkSetModelScale<1477369, 0x1D7>::Install();               // PipboyManager::InitPipboy
 		hkSetModelScreenPosition<1477369, 0x1B2>::Install();      // PipboyManager::InitPipboy
 		hkKillScreenEffects<643948, 0x6B>::Install();             // PipboyMenu::ProcessMessage
+		hkInstanceFormTrigger<1477369, 0x240>::Install();         // PipboyManager::InitPipboy
 	}
 
 	static void InstallPostLoad()
@@ -700,7 +701,6 @@ private:
 					bool third;   // 09
 				};
 				static_assert(sizeof(functor_t) == 0x10);
-
 				// clang-format on
 
 				static void ForEachAnimationGraph(RE::BSAnimationGraphManager* a_this, functor_t& a_functor)
@@ -1872,5 +1872,36 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&hkKillScreenEffects::KillScreenEffects)> _KillScreenEffects;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkInstanceFormTrigger
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_InstanceFormTrigger = trampoline.write_call<5>(target.address(), InstanceFormTrigger);
+		}
+
+	private:
+		static void InstanceFormTrigger(
+			[[maybe_unused]] const RE::BSFixedString& a_modName)
+		{
+			if (detail::IsExempt())
+			{
+				return _InstanceFormTrigger(a_modName);
+			}
+
+			if (MCM::Settings::Pipboy::bBackgroundBlur)
+			{
+				return _InstanceFormTrigger(a_modName);
+			}
+
+			return;
+		}
+
+		inline static REL::Relocation<decltype(&hkInstanceFormTrigger::InstanceFormTrigger)> _InstanceFormTrigger;
 	};
 };
