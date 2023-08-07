@@ -60,6 +60,7 @@ public:
 		hkPlayPipboyCloseAnim<926335, 0x3E8>::Install();          // TerminalMenu::ProcessMessage
 		hkPlayPipboyCloseAnim<1299608, 0x48>::Install();          // PipboyManager::OnPipboyOpened
 		hkPlayPipboyCloseAnim<301794, 0x105>::Install();          // ActorEquipManager::UseObject
+		hkOnPipboyCloseAnim<1546751, 0x26FC>::Install();          // TaskQueueInterface::TaskUnpackFunc
 		hkStartPipboyMode<663900, 0x6A>::Install();               // PipboyManager::PlayPipboyOpenAnim
 		hkStartPipboyMode<477096, 0x106>::Install();              // PipboyManager::PlayPipboyLoadHolotapeAnim
 		hkStartPipboyMode<809076, 0xB0>::Install();               // PipboyManager::PlayPipboyGenericOpenAnim
@@ -75,6 +76,7 @@ public:
 		hkSetEnableDynamicResolution<1231000, 0xF5>::Install();   // PipboyManager::OnPipboyCloseAnim
 		hkSetEnableDynamicResolution<1477369, 0x275>::Install();  // PipboyManager::InitPipboy
 		hkStopAnimationGraphListening<731410, 0xA6>::Install();   // PipboyManager::ClosedownPipboy
+		hkOnButtonEvent::Install();                               // PipboyMenu::OnButtonEvent
 	}
 
 	static void InstallPostLoad()
@@ -94,20 +96,94 @@ public:
 
 	static void ToggleQuickBoy()
 	{
-		if (auto PlayerControls = RE::PlayerControls::GetSingleton())
+		if (!MCM::Settings::Pipboy::bEnable)
 		{
-			QuickBoyAnimationHandler::Register(true);
-			if (!MCM::Settings::Runtime::bQuickBoy)
+			return;
+		}
+
+		if (MCM::Settings::Runtime::bQuickBoyTransition)
+		{
+			return;
+		}
+
+		RE::SendHUDMessage::ShowHUDMessage("QuickBoy", nullptr, false, false);
+
+		auto UI = RE::UI::GetSingleton();
+		if (!UI)
+		{
+			return;
+		}
+
+		if (!UI->GetMenuOpen("PipboyMenu"sv))
+		{
+			return;
+		}
+		
+		if (MCM::Settings::Runtime::bQuickBoy)
+		{
+			detail::PipboyBackgroundMenu::HideMenu();
+			if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 			{
-				PlayerControls->DoAction(
-					RE::DEFAULT_OBJECT::kActionPipboy,
-					RE::ActionInput::ACTIONPRIORITY::kTry);
+				Renderer->Disable();
+				Renderer->Release();
 			}
-			else
+
+			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
+			{
+				PlayerCamera->StartPipboyMode(false);
+			}
+
+			detail::QuickBoyAnimationHandler::Register(true);
+			if (auto TaskQueueInterface = RE::TaskQueueInterface::GetSingleton())
+			{
+				TaskQueueInterface->QueueShowPipboy(RE::DEFAULT_OBJECT::kActionPipboy);
+			}
+		}
+		else
+		{
+			detail::PipboyBackgroundMenu::ShowMenu();
+			if (auto Renderer = RE::Interface3D::Renderer::GetByName("PipboyMenu"sv))
+			{
+				Renderer->Disable();
+				Renderer->Release();
+			}
+
+			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
+			{
+				PlayerCamera->StopPipboyMode();
+			}
+
+			MCM::Settings::Runtime::bQuickBoy = true;
+			if (auto PlayerControls = RE::PlayerControls::GetSingleton())
 			{
 				PlayerControls->DoAction(
 					RE::DEFAULT_OBJECT::kActionPipboyClose,
 					RE::ActionInput::ACTIONPRIORITY::kTry);
+			}
+
+			if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
+			{
+				auto PipboyMenu = UI->GetMenu<RE::PipboyMenu>();
+
+				PipboyMenu->customRendererName = detail::PipboyScreenModel::GetRendererName();
+				if (auto PipboyManager = RE::PipboyManager::GetSingleton())
+				{
+					PipboyManager->inv3DModelManager.End3D();
+				}
+
+				if (MCM::Settings::Pipboy::bDisableFX
+				    && MCM::Settings::Pipboy::bUseColor)
+				{
+					detail::SetColorHelper(PipboyMenu.get());
+				}
+
+				PipboyMenu->SetViewportRect(
+					{ static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
+				      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
+				      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
+				      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom) });
+
+				Renderer->Enable();
 			}
 		}
 	}
@@ -414,6 +490,11 @@ private:
 
 			static void ShowMenu()
 			{
+				if (!MCM::Settings::Pipboy::bBackground)
+				{
+					return;
+				}
+
 				auto UIMessageQueue = RE::UIMessageQueue::GetSingleton();
 				if (UIMessageQueue)
 				{
@@ -435,6 +516,11 @@ private:
 
 			static void HideMenu()
 			{
+				if (!MCM::Settings::Pipboy::bBackground)
+				{
+					return;
+				}
+
 				auto UIMessageQueue = RE::UIMessageQueue::GetSingleton();
 				if (UIMessageQueue)
 				{
@@ -450,6 +536,101 @@ private:
 						RE::UI_MESSAGE_TYPE::kHide);
 				}
 			}
+		};
+
+		class QuickBoyAnimationHandler :
+			RE::BSTEventSink<RE::BSAnimationGraphEvent>
+		{
+		public:
+			static void Register(bool a_register)
+			{
+				MCM::Settings::Runtime::bQuickBoyTransition = a_register;
+				PipboyAnim::Register(a_register);
+			}
+
+			[[nodiscard]] static QuickBoyAnimationHandler* GetSingleton()
+			{
+				static QuickBoyAnimationHandler singleton;
+				return std::addressof(singleton);
+			}
+
+			virtual RE::BSEventNotifyControl ProcessEvent(const RE::BSAnimationGraphEvent& a_event, RE::BSTEventSource<RE::BSAnimationGraphEvent>*) override
+			{
+				if (MCM::Settings::Runtime::bQuickBoy)
+				{
+					if (a_event.tag == "pipboyLightOff"sv || a_event.tag == "pipboyOpened"sv)
+					{
+						MCM::Settings::Runtime::bQuickBoy = false;
+						if (auto PipboyManager = RE::PipboyManager::GetSingleton())
+						{
+							PipboyManager->EnablePipboyShader();
+							if (auto UI = RE::UI::GetSingleton())
+							{
+								auto PipboyMenu = UI->GetMenu<RE::PipboyMenu>();
+								PipboyManager->AddMenuToPipboy(
+									*PipboyMenu,
+									{ 0, 1.0f, 0, 1.0f },
+									{ 0, 1.0f, 0, 1.0f });
+								PipboyManager->inv3DModelManager.End3D();
+								PipboyManager->StartAnimationGraphListening();
+							}
+						}
+
+						QuickBoyAnimationHandler::Register(false);
+					}
+				}
+
+				return RE::BSEventNotifyControl::kContinue;
+			}
+
+		private:
+			class PipboyAnim
+			{
+			public:
+				static void Register(bool a_register)
+				{
+					if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton())
+					{
+						RE::BSTSmartPointer<RE::BSAnimationGraphManager> Manager;
+						if (PlayerCharacter->GetAnimationGraphManagerImpl(Manager))
+						{
+							auto functor = functor_t{ a_register };
+							ForEachAnimationGraph(Manager.get(), functor);
+						}
+					}
+				}
+
+			private:
+				// clang-format off
+				struct functor_t
+				{
+				public:
+					functor_t(bool a_listen, bool a_third = true) : listen(a_listen), third(a_third) {
+						sink = QuickBoyAnimationHandler::GetSingleton();
+					}
+
+					bool operator()(const RE::BSTSmartPointer<RE::BShkbAnimationGraph>& a_graph)
+					{
+						using func_t = bool(functor_t::*)(const RE::BSTSmartPointer<RE::BShkbAnimationGraph>&);
+						REL::Relocation<func_t> func{ REL::ID(348781) };
+						return func(this, a_graph);
+					}
+
+					// members
+					void* sink;   // 00
+					bool listen;  // 08
+					bool third;   // 09
+				};
+				static_assert(sizeof(functor_t) == 0x10);
+				// clang-format on
+
+				static void ForEachAnimationGraph(RE::BSAnimationGraphManager* a_this, functor_t& a_functor)
+				{
+					using func_t = decltype(&ForEachAnimationGraph);
+					REL::Relocation<func_t> func{ REL::ID(684075) };
+					return func(a_this, a_functor);
+				}
+			};
 		};
 
 		static bool IsExempt()
@@ -520,77 +701,6 @@ private:
 				a_menu->filterHolder->CreateAndSetFiltersToColor(PipboyColorR, PipboyColorG, PipboyColorB, 1.0);
 			}
 		}
-	};
-
-	class QuickBoyAnimationHandler :
-		RE::BSTEventSink<RE::BSAnimationGraphEvent>
-	{
-	public:
-		static void Register(bool a_register)
-		{
-			PipboyAnim::Register(a_register);
-		}
-
-		[[nodiscard]] static QuickBoyAnimationHandler* GetSingleton()
-		{
-			static QuickBoyAnimationHandler singleton;
-			return std::addressof(singleton);
-		}
-
-		virtual RE::BSEventNotifyControl ProcessEvent(const RE::BSAnimationGraphEvent& a_event, RE::BSTEventSource<RE::BSAnimationGraphEvent>*) override
-		{
-			logger::info("Recieved Event: {:s}"sv, a_event.tag.c_str());
-			return RE::BSEventNotifyControl::kContinue;
-		}
-
-	private:
-		class PipboyAnim
-		{
-		public:
-			static void Register(bool a_register)
-			{
-				if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton())
-				{
-					RE::BSTSmartPointer<RE::BSAnimationGraphManager> Manager;
-					if (PlayerCharacter->GetAnimationGraphManagerImpl(Manager))
-					{
-						auto functor = functor_t{ a_register };
-						ForEachAnimationGraph(Manager.get(), functor);
-					}
-				}
-			}
-
-		private:
-			// clang-format off
-			struct functor_t
-			{
-			public:
-				functor_t(bool a_listen, bool a_third = true) : listen(a_listen), third(a_third) {
-					sink = QuickBoyAnimationHandler::GetSingleton();
-				}
-
-				bool operator()(const RE::BSTSmartPointer<RE::BShkbAnimationGraph>& a_graph)
-				{
-					using func_t = bool(functor_t::*)(const RE::BSTSmartPointer<RE::BShkbAnimationGraph>&);
-					REL::Relocation<func_t> func{ REL::ID(348781) };
-					return func(this, a_graph);
-				}
-
-				// members
-				void* sink;   // 00
-				bool listen;  // 08
-				bool third;   // 09
-			};
-			static_assert(sizeof(functor_t) == 0x10);
-			// clang-format on
-
-			static void ForEachAnimationGraph(RE::BSAnimationGraphManager* a_this, functor_t& a_functor)
-			{
-				using func_t = decltype(&ForEachAnimationGraph);
-				REL::Relocation<func_t> func{ REL::ID(684075) };
-				return func(a_this, a_functor);
-			}
-		};
 	};
 
 	template<std::uint64_t ID, std::ptrdiff_t OFF>
@@ -1079,6 +1189,11 @@ private:
 			[[maybe_unused]] const RE::BSAnimationGraphEvent& a_event,
 			[[maybe_unused]] RE::BSTEventSource<RE::BSAnimationGraphEvent>* a_source)
 		{
+			if (MCM::Settings::Runtime::bQuickBoyTransition)
+			{
+				return RE::BSEventNotifyControl::kContinue;
+			}
+
 			if (detail::IsExempt())
 			{
 				return _ProcessEvent(a_this, a_event, a_source);
@@ -1129,11 +1244,7 @@ private:
 				case RE::UI_MESSAGE_TYPE::kShow:
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 					{
-						if (MCM::Settings::Pipboy::bBackground)
-						{
-							detail::PipboyBackgroundMenu::ShowMenu();
-						}
-
+						detail::PipboyBackgroundMenu::ShowMenu();
 						Renderer->Enable();
 					}
 					break;
@@ -1141,11 +1252,7 @@ private:
 				case RE::UI_MESSAGE_TYPE::kHide:
 					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
 					{
-						if (MCM::Settings::Pipboy::bBackground)
-						{
-							detail::PipboyBackgroundMenu::HideMenu();
-						}
-
+						detail::PipboyBackgroundMenu::HideMenu();
 						Renderer->Disable();
 					}
 					break;
@@ -1267,6 +1374,11 @@ private:
 		static void OnPipboyOpenAnim(
 			[[maybe_unused]] RE::PipboyManager* a_this)
 		{
+			if (MCM::Settings::Runtime::bQuickBoyTransition)
+			{
+				return;
+			}
+
 			if (detail::IsExempt())
 			{
 				return _OnPipboyOpenAnim(a_this);
@@ -1335,6 +1447,32 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&hkPlayPipboyCloseAnim::PlayPipboyCloseAnim)> _PlayPipboyCloseAnim;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkOnPipboyCloseAnim
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_OnPipboyCloseAnim = trampoline.write_call<5>(target.address(), OnPipboyCloseAnim);
+		}
+
+	private:
+		static void OnPipboyCloseAnim(
+			[[maybe_unused]] RE::PipboyManager* a_this)
+		{
+			if (MCM::Settings::Runtime::bQuickBoyTransition)
+			{
+				return;
+			}
+
+			return _OnPipboyCloseAnim(a_this);
+		}
+
+		inline static REL::Relocation<decltype(&hkOnPipboyCloseAnim::OnPipboyCloseAnim)> _OnPipboyCloseAnim;
 	};
 
 	template<std::uint64_t ID, std::ptrdiff_t OFF>
@@ -1549,6 +1687,43 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&hkStopAnimationGraphListening::StopAnimationGraphListening)> _StopAnimationGraphListening;
+	};
+
+	class hkOnButtonEvent
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ RE::PipboyMenu::VTABLE[1] };
+			_ShouldHandleEvent = target.write_vfunc(0x01, reinterpret_cast<std::uintptr_t>(ShouldHandleEvent));
+			_OnButtonEvent = target.write_vfunc(0x08, reinterpret_cast<std::uintptr_t>(OnButtonEvent));
+		}
+
+	private:
+		static bool ShouldHandleEvent(
+			[[maybe_unused]] RE::IMenu* a_this,
+			[[maybe_unused]] const RE::InputEvent* a_event)
+		{
+			return _ShouldHandleEvent(a_this, a_event)
+			       && !MCM::Settings::Runtime::bQuickBoyTransition;
+		}
+
+		static void OnButtonEvent(
+			[[maybe_unused]] RE::IMenu* a_this,
+			[[maybe_unused]] const RE::ButtonEvent* a_event)
+		{
+			if (a_event->QJustPressed()
+			    && (a_event->idCode == MCM::Settings::Runtime::QuickBoyKey))
+			{
+				ToggleQuickBoy();
+				return;
+			}
+
+			return _OnButtonEvent(a_this, a_event);
+		}
+
+		inline static REL::Relocation<decltype(&ShouldHandleEvent)> _ShouldHandleEvent;
+		inline static REL::Relocation<decltype(&OnButtonEvent)> _OnButtonEvent;
 	};
 
 	class hkSetModelScreenPosition;
