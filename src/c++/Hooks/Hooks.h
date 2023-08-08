@@ -49,7 +49,7 @@ public:
 		hkProcessMessageT<RE::PipboyHolotapeMenu>::Install();     // PipboyHolotapeMenu::ProcessMessage
 
 		hkPlayPipboyOpenAnim<943894, 0x134>::Install();           // UseItemCommand::DoExecute
-		hkPlayPipboyOpenAnim<743427, 0x20>::Install();            // PipboyManager::PlayPipboyOpenTerminalAnim
+		hkPlayPipboyOpenAnim<743427, 0x20>::InstallJmp();         // PipboyManager::PlayPipboyOpenTerminalAnim
 		hkPlayPipboyOpenAnim<181358, 0x23F>::Install();           // PipboyHandler::HandleEvent
 		hkOnPipboyOpenAnim<477096, 0x185>::Install();             // PipboyManager::PlayPipboyLoadHolotapeAnim
 		hkOnPipboyOpenAnim<809076, 0xDA>::Install();              // PipboyManager::PlayPipboyGenericOpenAnim
@@ -1386,6 +1386,13 @@ private:
 			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
 			auto& trampoline = F4SE::GetTrampoline();
 			_PlayPipboyOpenAnim = trampoline.write_call<5>(target.address(), PlayPipboyOpenAnim);
+		}
+
+		static void InstallJmp()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_PlayPipboyOpenAnim = trampoline.write_branch<5>(target.address(), PlayPipboyOpenAnim);
 		}
 
 	private:
