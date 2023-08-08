@@ -137,6 +137,17 @@ public:
 				PlayerCamera->StartPipboyMode(false);
 			}
 
+			if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton())
+			{
+				if (PlayerCharacter->currentProcess)
+				{
+					PlayerCharacter->currentProcess->SetWeaponBonesCulled(
+						*PlayerCharacter,
+						true,
+						RE::WEAPON_CULL_TYPE::kGeneral);
+				}
+			}
+
 			detail::QuickBoyAnimationHandler::Register(true);
 			if (auto TaskQueueInterface = RE::TaskQueueInterface::GetSingleton())
 			{
@@ -154,6 +165,17 @@ public:
 			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
 			{
 				PlayerCamera->StopPipboyMode();
+			}
+
+			if (auto PlayerCharacter = RE::PlayerCharacter::GetSingleton())
+			{
+				if (PlayerCharacter->currentProcess)
+				{
+					PlayerCharacter->currentProcess->SetWeaponBonesCulled(
+						*PlayerCharacter,
+						false,
+						RE::WEAPON_CULL_TYPE::kGeneral);
+				}
 			}
 
 			MCM::Settings::Runtime::bQuickBoy = true;
