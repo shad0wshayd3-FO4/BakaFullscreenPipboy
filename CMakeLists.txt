@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 set(NAME "BakaFullscreenPipboy")
-set(VERSION 1.4.0)
+set(VERSION 1.5.0)
 
 # ---- Options ----
 
