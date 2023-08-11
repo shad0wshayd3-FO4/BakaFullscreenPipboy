@@ -337,7 +337,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kButtonBarMenu,
+							RE::UI_DEPTH_PRIORITY::kMessage,
 							0.0f,
 							true))
 					{
@@ -487,6 +487,7 @@ private:
 					{
 						Renderer->MainScreen_SetOpacityAlpha(
 							static_cast<float>(MCM::Settings::Pipboy::fBackgroundAlpha));
+						Renderer->MainScreen_SetPostAA(RE::PowerArmor::PlayerInPowerArmor());
 						PipboyBackgroundMenu::ShowMenu();
 					}
 					else
@@ -518,7 +519,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kButtonBarMenu,
+							RE::UI_DEPTH_PRIORITY::kLoadingMenu,
 							0.0f,
 							true))
 					{
@@ -529,9 +530,13 @@ private:
 							RE::Interface3D::ScreenMode::kScreenAttached,
 							"HUDGlassFlat:0",
 							"Materials\\Interface\\HUDGlassFlat.BGEM");
+						Renderer->MainScreen_EnableScreenAttached3DMasking(
+							"HUDShadowFlat:0",
+							"Materials\\Interface\\ModMenuShadow.BGEM");
 
 						Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
 						Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kHUDGlass);
+						Renderer->hideScreenWhenDisabled = true;
 						return Renderer;
 					}
 				}
