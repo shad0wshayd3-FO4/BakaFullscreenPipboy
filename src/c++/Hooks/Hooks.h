@@ -330,9 +330,9 @@ private:
 				if (auto node = model->IsNode())
 				{
 					RE::NiUpdateData UpdateData;
-					node->local.translate.x = 0;
-					node->local.translate.y = 350;
-					node->local.translate.z = 0;
+					node->local.translate.x = setting::fUIFlatModel_TranslateX->GetFloat();
+					node->local.translate.y = setting::fUIFlatModel_TranslateY->GetFloat();
+					node->local.translate.z = setting::fUIFlatModel_TranslateZ->GetFloat();
 					node->Update(UpdateData);
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
@@ -511,9 +511,9 @@ private:
 				if (auto node = model->IsNode())
 				{
 					RE::NiUpdateData UpdateData;
-					node->local.translate.x = 0;
-					node->local.translate.y = 350;
-					node->local.translate.z = 0;
+					node->local.translate.x = setting::fUIFlatModel_TranslateX->GetFloat();
+					node->local.translate.y = setting::fUIFlatModel_TranslateY->GetFloat();
+					node->local.translate.z = setting::fUIFlatModel_TranslateZ->GetFloat();
 					node->Update(UpdateData);
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
@@ -812,6 +812,10 @@ private:
 		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemPAScreenPosX{ REL::ID(1251037) };
 		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemPAScreenPosY{ REL::ID(326697) };
 		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fPipboy3DItemPAScale{ REL::ID(984624) };
+
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fUIFlatModel_TranslateX{ REL::ID(314513) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fUIFlatModel_TranslateY{ REL::ID(972452) };
+		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fUIFlatModel_TranslateZ{ REL::ID(48328) };
 	};
 
 	template<std::uint64_t ID, std::ptrdiff_t OFF>
