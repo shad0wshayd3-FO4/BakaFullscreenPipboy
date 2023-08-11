@@ -15,6 +15,7 @@ namespace MCM
 			inline static bool bUseColorPA{ true };
 			inline static bool bBackground{ false };
 			inline static bool bBackgroundBlur{ true };
+			inline static bool bBackgroundSmall{ false };
 			inline static bool bKeepLowHealthIMod{ false };
 
 			inline static double fBackgroundAlpha{ 1.0 };
@@ -57,6 +58,7 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bUseColorPA", Pipboy::bUseColorPA);
 			GetModSettingBool("Pipboy", "bBackground", Pipboy::bBackground);
 			GetModSettingBool("Pipboy", "bBackgroundBlur", Pipboy::bBackgroundBlur);
+			GetModSettingBool("Pipboy", "bBackgroundSmall", Pipboy::bBackgroundSmall);
 			GetModSettingBool("Pipboy", "bKeepLowHealthIMod", Pipboy::bKeepLowHealthIMod);
 
 			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
@@ -118,6 +120,19 @@ namespace MCM
 
 		static void ResetStatePost()
 		{
+			if (auto UI = RE::UI::GetSingleton())
+			{
+				if (auto PipboyBackgroundMenuSmall = UI->GetMenu("PipboyBackgroundMenuSmall"))
+				{
+					PipboyBackgroundMenuSmall->SetViewportRect({
+						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
+						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
+						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
+						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom),
+					});
+				}
+			}
+
 			m_ini_base.Reset();
 			m_ini_user.Reset();
 		}

@@ -97,6 +97,9 @@ public:
 			UI->RegisterMenu(
 				"PipboyBackgroundMenu",
 				detail::PipboyBackgroundMenu::Create);
+			UI->RegisterMenu(
+				"PipboyBackgroundMenuSmall",
+				detail::PipboyBackgroundMenuSmall::Create);
 		}
 	}
 
@@ -593,9 +596,18 @@ private:
 
 				if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 				{
-					UIMessageQueue->AddMessage(
-						"PipboyBackgroundMenu",
-						RE::UI_MESSAGE_TYPE::kShow);
+					if (!MCM::Settings::Pipboy::bBackgroundSmall)
+					{
+						UIMessageQueue->AddMessage(
+							"PipboyBackgroundMenu",
+							RE::UI_MESSAGE_TYPE::kShow);
+					}
+					else
+					{
+						UIMessageQueue->AddMessage(
+							"PipboyBackgroundMenuSmall",
+							RE::UI_MESSAGE_TYPE::kShow);
+					}
 				}
 			}
 
@@ -608,10 +620,52 @@ private:
 
 				if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 				{
-					UIMessageQueue->AddMessage(
-						"PipboyBackgroundMenu",
-						RE::UI_MESSAGE_TYPE::kHide);
+					if (!MCM::Settings::Pipboy::bBackgroundSmall)
+					{
+						UIMessageQueue->AddMessage(
+							"PipboyBackgroundMenu",
+							RE::UI_MESSAGE_TYPE::kHide);
+					}
+					else
+					{
+						UIMessageQueue->AddMessage(
+							"PipboyBackgroundMenuSmall",
+							RE::UI_MESSAGE_TYPE::kHide);
+					}
 				}
+			}
+		};
+
+		class PipboyBackgroundMenuSmall :
+			public RE::GameMenuBase
+		{
+		public:
+			PipboyBackgroundMenuSmall()
+			{
+				customRendererName = "PipboyBackgroundScreenModel";
+
+				menuFlags.set(
+					RE::UI_MENU_FLAGS::kCustomRendering,
+					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
+				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
+
+				auto MoviePath = "Interface\\PipboyBackgroundMenuSmall.swf"sv;
+				const auto ScaleformManager = RE::BSScaleformManager::GetSingleton();
+				[[maybe_unused]] const auto LoadMovieSuccess =
+					ScaleformManager->LoadMovieEx(*this, MoviePath, "root.Menu_mc");
+				assert(LoadMovieSuccess);
+
+				filterHolder = RE::msvc::make_unique<RE::BSGFxShaderFXTarget>(*uiMovie, "root.Menu_mc.Background_mc");
+				if (filterHolder)
+				{
+					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 1.0f);
+					shaderFXObjects.push_back(filterHolder.get());
+				}
+			}
+
+			static RE::IMenu* Create(const RE::UIMessage&)
+			{
+				return new PipboyBackgroundMenuSmall();
 			}
 		};
 
