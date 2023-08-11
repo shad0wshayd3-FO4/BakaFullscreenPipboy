@@ -97,9 +97,6 @@ public:
 			UI->RegisterMenu(
 				"PipboyBackgroundMenu",
 				detail::PipboyBackgroundMenu::Create);
-			UI->RegisterMenu(
-				"PipboyBackgroundMenuPA",
-				detail::PipboyBackgroundMenuPA::Create);
 		}
 	}
 
@@ -320,7 +317,7 @@ private:
 				return PipboyScreenModel::GetSingleton()->CreateRenderer();
 			}
 
-			F4_HEAP_REDEFINE_NEW();
+			F4_HEAP_REDEFINE_NEW(PipboyScreenModel);
 
 		private:
 			RE::Interface3D::Renderer* CreateRenderer()
@@ -340,7 +337,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kPauseMenu,
+							RE::UI_DEPTH_PRIORITY::kButtonBarMenu,
 							0.0f,
 							true))
 					{
@@ -501,7 +498,7 @@ private:
 				return RE::BSEventNotifyControl::kContinue;
 			}
 
-			F4_HEAP_REDEFINE_NEW();
+			F4_HEAP_REDEFINE_NEW(PipboyBackgroundScreenModel);
 
 		private:
 			RE::Interface3D::Renderer* CreateRenderer()
@@ -521,7 +518,7 @@ private:
 
 					if (auto Renderer = RE::Interface3D::Renderer::Create(
 							GetRendererName(),
-							RE::UI_DEPTH_PRIORITY::kGameMessage,
+							RE::UI_DEPTH_PRIORITY::kButtonBarMenu,
 							0.0f,
 							true))
 					{
@@ -558,7 +555,6 @@ private:
 				menuFlags.set(
 					RE::UI_MENU_FLAGS::kCustomRendering,
 					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
-				menuHUDMode = "Pipboy";
 				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
 
 				auto State = RE::BSGraphics::State::GetSingleton();
@@ -575,7 +571,7 @@ private:
 				filterHolder = RE::msvc::make_unique<RE::BSGFxShaderFXTarget>(*uiMovie, "root.Menu_mc.Background_mc");
 				if (filterHolder)
 				{
-					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 0.0f);
+					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 1.0f);
 					shaderFXObjects.push_back(filterHolder.get());
 				}
 			}
@@ -597,9 +593,6 @@ private:
 					UIMessageQueue->AddMessage(
 						"PipboyBackgroundMenu",
 						RE::UI_MESSAGE_TYPE::kShow);
-					UIMessageQueue->AddMessage(
-						"PipboyBackgroundMenuPA",
-						RE::UI_MESSAGE_TYPE::kShow);
 				}
 			}
 
@@ -615,21 +608,7 @@ private:
 					UIMessageQueue->AddMessage(
 						"PipboyBackgroundMenu",
 						RE::UI_MESSAGE_TYPE::kHide);
-					UIMessageQueue->AddMessage(
-						"PipboyBackgroundMenuPA",
-						RE::UI_MESSAGE_TYPE::kHide);
 				}
-			}
-		};
-
-		class PipboyBackgroundMenuPA :
-			public PipboyBackgroundMenu
-		{
-		public:
-			PipboyBackgroundMenuPA() :
-				PipboyBackgroundMenu()
-			{
-				menuHUDMode = "PowerArmor";
 			}
 		};
 
