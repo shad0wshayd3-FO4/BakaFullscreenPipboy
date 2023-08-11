@@ -81,6 +81,8 @@ public:
 		hkSetModelScreenPosition<1477369, 0x1B2>::Install();      // PipboyManager::InitPipboy
 		hkKillScreenEffects<643948, 0x6B>::Install();             // PipboyMenu::ProcessMessage
 		hkInstanceFormTrigger<1477369, 0x240>::Install();         // PipboyManager::InitPipboy
+		hkShowPipboyLight<1231000, 0x8A>::Install();              // PipboyManager::OnPipboyCloseAnim
+		hkShowPipboyLight<1477369, 0x342>::Install();             // PipboyManager::InitPipboy
 	}
 
 	static void InstallPostLoad()
@@ -146,6 +148,14 @@ public:
 						true,
 						RE::WEAPON_CULL_TYPE::kGeneral);
 				}
+
+				if (auto PipboyManager = RE::PipboyManager::GetSingleton())
+				{
+					if (PipboyManager->wasPipboyLightActive)
+					{
+						PlayerCharacter->ShowPipboyLight(false, true);
+					}
+				}
 			}
 
 			detail::QuickBoyAnimationHandler::Register(true);
@@ -175,6 +185,14 @@ public:
 						*PlayerCharacter,
 						false,
 						RE::WEAPON_CULL_TYPE::kGeneral);
+				}
+
+				if (auto PipboyManager = RE::PipboyManager::GetSingleton())
+				{
+					if (PipboyManager->wasPipboyLightActive)
+					{
+						PlayerCharacter->ShowPipboyLight(true, true);
+					}
 				}
 			}
 
@@ -1934,5 +1952,33 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&hkInstanceFormTrigger::InstanceFormTrigger)> _InstanceFormTrigger;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkShowPipboyLight
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_ShowPipboyLight = trampoline.write_call<5>(target.address(), ShowPipboyLight);
+		}
+
+	private:
+		static void ShowPipboyLight(
+			[[maybe_unused]] RE::PlayerCharacter* a_this,
+			[[maybe_unused]] bool a_show,
+			[[maybe_unused]] bool a_skipEffects)
+		{
+			if (detail::IsExempt())
+			{
+				return _ShowPipboyLight(a_this, a_show, a_skipEffects);
+			}
+
+			return;
+		}
+
+		inline static REL::Relocation<decltype(&hkShowPipboyLight::ShowPipboyLight)> _ShowPipboyLight;
 	};
 };
