@@ -259,11 +259,10 @@ private:
 					true
 				};
 
-				auto State = RE::BSGraphics::State::GetSingleton();
-				auto ModelPath =
-					((static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight)) == (16.0 / 10.0))
-						? "Interface\\Objects\\HUDGlassFlat16x10.nif"sv
-						: "Interface\\Objects\\HUDGlassFlat.nif"sv;
+				auto& ModelPath =
+					GetAspectRatioString(
+						"Interface\\Objects\\HUDGlassFlat.nif"sv,
+						"Interface\\Objects\\HUDGlassFlat16x10.nif"sv);
 
 				RE::NiTexture::SetAllowDegrade(false);
 				RE::BSModelDB::Demand(
@@ -398,11 +397,10 @@ private:
 					true
 				};
 
-				auto State = RE::BSGraphics::State::GetSingleton();
-				auto ModelPath =
-					((static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight)) == (16.0 / 10.0))
-						? "Interface\\Objects\\HUDGlassFlat16x10.nif"sv
-						: "Interface\\Objects\\HUDGlassFlat.nif"sv;
+				auto& ModelPath =
+					GetAspectRatioString(
+						"Interface\\Objects\\HUDGlassFlat.nif"sv,
+						"Interface\\Objects\\HUDGlassFlat16x10.nif"sv);
 
 				RE::NiTexture::SetAllowDegrade(false);
 				RE::BSModelDB::Demand(
@@ -562,11 +560,11 @@ private:
 					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
 				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
 
-				auto State = RE::BSGraphics::State::GetSingleton();
-				auto MoviePath =
-					((static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight)) == (16.0 / 10.0))
-						? "Interface\\PipboyBackgroundMenu16x10.swf"sv
-						: "Interface\\PipboyBackgroundMenu.swf"sv;
+				auto& MoviePath =
+					GetAspectRatioString(
+						"Interface\\PipboyBackgroundMenu.swf"sv,
+						"Interface\\PipboyBackgroundMenu16x10.swf"sv,
+						"Interface\\PipboyBackgroundMenu21x9.swf"sv);
 
 				const auto ScaleformManager = RE::BSScaleformManager::GetSingleton();
 				[[maybe_unused]] const auto LoadMovieSuccess =
@@ -806,6 +804,33 @@ private:
 				a_menu->filterHolder->CreateAndSetFiltersToColor(PipboyColorR, PipboyColorG, PipboyColorB, 1.0);
 			}
 		}
+
+		static const std::string_view& GetAspectRatioString(
+			const std::string_view& a_16x09,
+			const std::string_view& a_16x10 = ""sv,
+			const std::string_view& a_21x09 = ""sv)
+		{
+			auto State = RE::BSGraphics::State::GetSingleton();
+			auto ratio = static_cast<double>(State.backBufferWidth)
+			             / static_cast<double>(State.backBufferHeight);
+
+			if (ratio == ratio_16x10
+				&& !a_16x10.empty())
+			{
+				return a_16x10;
+			}
+			
+			if (ratio == ratio_21x09
+				&& !a_21x09.empty())
+			{
+				return a_21x09;
+			}
+
+			return a_16x09;
+		}
+
+		static constexpr auto ratio_16x10{ 16.0 / 10.0 };
+		static constexpr auto ratio_21x09{ 21.0 / 09.0 };
 	};
 
 	class setting
