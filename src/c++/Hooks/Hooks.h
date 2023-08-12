@@ -84,6 +84,7 @@ public:
 		hkInstanceFormTrigger<1477369, 0x240>::Install();         // PipboyManager::InitPipboy
 		hkShowPipboyLight<1231000, 0x8A>::Install();              // PipboyManager::OnPipboyCloseAnim
 		hkShowPipboyLight<1477369, 0x342>::Install();             // PipboyManager::InitPipboy
+		hkRenderEffect<878870, 0x206>::Install();                 // Interface3D::Renderer::DrawPostFX
 	}
 
 	static void InstallPostLoad()
@@ -2055,5 +2056,36 @@ private:
 		}
 
 		inline static REL::Relocation<decltype(&hkShowPipboyLight::ShowPipboyLight)> _ShowPipboyLight;
+	};
+
+	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	class hkRenderEffect
+	{
+	public:
+		static void Install()
+		{
+			static REL::Relocation<std::uintptr_t> target{ REL::ID(ID), OFF };
+			auto& trampoline = F4SE::GetTrampoline();
+			_RenderEffect = trampoline.write_call<5>(target.address(), RenderEffect);
+		}
+
+	private:
+		static void RenderEffect(
+			[[maybe_unused]] RE::ImageSpaceManager* a_this,
+			[[maybe_unused]] std::int32_t a_effect,  // ImageSpaceManager::ImageSpaceEffectEnum
+			[[maybe_unused]] std::int32_t a_sourceTarget,
+			[[maybe_unused]] std::int32_t a_destTarget,
+			[[maybe_unused]] RE::ImageSpaceEffectParam* a_param)
+		{
+			if (MCM::Settings::Pipboy::bDisableFX
+				&& MCM::Settings::Pipboy::bDisableFXBoth)
+			{
+				return _RenderEffect(a_this, 0x48, a_sourceTarget, a_destTarget, a_param);
+			}
+
+			return _RenderEffect(a_this, a_effect, a_sourceTarget, a_destTarget, a_param);
+		}
+
+		inline static REL::Relocation<decltype(&hkRenderEffect::RenderEffect)> _RenderEffect;
 	};
 };

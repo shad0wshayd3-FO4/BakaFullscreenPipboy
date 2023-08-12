@@ -11,6 +11,7 @@ namespace MCM
 			inline static bool bEnable{ true };
 			inline static bool bQuickBoyKey{ false };
 			inline static bool bDisableFX{ true };
+			inline static bool bDisableFXBoth{ true };
 			inline static bool bUseColor{ true };
 			inline static bool bUseColorPA{ true };
 			inline static bool bBackground{ false };
@@ -58,6 +59,7 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bEnable", Pipboy::bEnable);
 			GetModSettingBool("Pipboy", "bQuickBoyKey", Pipboy::bQuickBoyKey);
 			GetModSettingBool("Pipboy", "bDisableFX", Pipboy::bDisableFX);
+			GetModSettingBool("Pipboy", "bDisableFXBoth", Pipboy::bDisableFXBoth);
 			GetModSettingBool("Pipboy", "bUseColor", Pipboy::bUseColor);
 			GetModSettingBool("Pipboy", "bUseColorPA", Pipboy::bUseColorPA);
 			GetModSettingBool("Pipboy", "bBackground", Pipboy::bBackground);
