@@ -809,8 +809,7 @@ private:
 				{
 					return true;
 				}
-				else if (MCM::Settings::Pipboy::bPowerArmorOnly
-					&& !RE::PowerArmor::PlayerInPowerArmor())
+				else if (MCM::Settings::Pipboy::bPowerArmorOnly && !RE::PowerArmor::PlayerInPowerArmor())
 				{
 					return true;
 				}
@@ -2083,7 +2082,7 @@ private:
 			[[maybe_unused]] RE::ImageSpaceEffectParam* a_param)
 		{
 			if (MCM::Settings::Pipboy::bDisableFX
-				&& MCM::Settings::Pipboy::bDisableFXBoth)
+			    && MCM::Settings::Pipboy::bDisableFXBoth)
 			{
 				return _RenderEffect(a_this, 0x48, a_sourceTarget, a_destTarget, a_param);
 			}
