@@ -40,6 +40,7 @@ public:
 		hkQActorInPowerArmor<809076, 0x29, true>::Install();      // PipboyManager::PlayPipboyGenericOpenAnim
 		hkQActorInPowerArmor<1444875, 0x46, true>::Install();     // PipboyManager::LowerPipboy
 		hkQActorInPowerArmor<726763, 0xC6, true>::Install();      // PipboyManager::RaisePipboy
+		hkQActorInPowerArmor<302903, 0x29, true>::Install();      // PipboyManager::ProcessLoweringReason
 		hkQActorInPowerArmorRW<1411297, 0x162>::Install();        // ReadyWeaponHandler::HandleEvent
 		hkPlayPipboyLoadHolotapeAnim<634650, 0x9E>::Install();    // PipboyInventoryMenu::PlayHolotape
 		hkPlayPipboyLoadHolotapeAnim<1411297, 0x1BD>::Install();  // ReadyWeaponHandler::HandleEvent
