@@ -876,13 +876,13 @@ private:
 			             / static_cast<double>(State.backBufferHeight);
 
 			if (ratio == ratio_16x10
-				&& !a_16x10.empty())
+			    && !a_16x10.empty())
 			{
 				return a_16x10;
 			}
-			
+
 			if (ratio == ratio_21x09
-				&& !a_21x09.empty())
+			    && !a_21x09.empty())
 			{
 				return a_21x09;
 			}
