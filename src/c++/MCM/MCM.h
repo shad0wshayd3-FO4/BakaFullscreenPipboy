@@ -18,6 +18,7 @@ namespace MCM
 			inline static bool bBackgroundBlur{ true };
 			inline static bool bBackgroundSmall{ false };
 			inline static bool bKeepLowHealthIMod{ false };
+			inline static bool bPowerArmorOnly{ false };
 
 			inline static double fBackgroundAlpha{ 1.0 };
 			inline static double fBackgroundViewportLeft{ 0.0 };
@@ -66,6 +67,7 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bBackgroundBlur", Pipboy::bBackgroundBlur);
 			GetModSettingBool("Pipboy", "bBackgroundSmall", Pipboy::bBackgroundSmall);
 			GetModSettingBool("Pipboy", "bKeepLowHealthIMod", Pipboy::bKeepLowHealthIMod);
+			GetModSettingBool("Pipboy", "bPowerArmorOnly", Pipboy::bPowerArmorOnly);
 
 			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
 			GetModSettingDouble("Pipboy", "fBackgroundViewportLeft", Pipboy::fBackgroundViewportLeft);

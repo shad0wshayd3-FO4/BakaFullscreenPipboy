@@ -809,6 +809,11 @@ private:
 				{
 					return true;
 				}
+				else if (MCM::Settings::Pipboy::bPowerArmorOnly
+					&& !RE::PowerArmor::PlayerInPowerArmor())
+				{
+					return true;
+				}
 			}
 
 			return false;
