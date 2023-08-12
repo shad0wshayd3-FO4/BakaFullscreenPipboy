@@ -661,6 +661,13 @@ private:
 					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 1.0f);
 					shaderFXObjects.push_back(filterHolder.get());
 				}
+
+				SetViewportRect({
+					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportLeft),
+					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportRight),
+					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportTop),
+					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportBottom),
+				});
 			}
 
 			static RE::IMenu* Create(const RE::UIMessage&)

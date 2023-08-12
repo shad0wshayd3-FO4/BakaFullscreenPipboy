@@ -19,6 +19,10 @@ namespace MCM
 			inline static bool bKeepLowHealthIMod{ false };
 
 			inline static double fBackgroundAlpha{ 1.0 };
+			inline static double fBackgroundViewportLeft{ 0.0 };
+			inline static double fBackgroundViewportRight{ 1.0 };
+			inline static double fBackgroundViewportTop{ 0.02 };
+			inline static double fBackgroundViewportBottom{ 0.90 };
 			inline static double fPipboyViewportLeft{ 0.0 };
 			inline static double fPipboyViewportRight{ 1.0 };
 			inline static double fPipboyViewportTop{ 0.0 };
@@ -62,6 +66,10 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bKeepLowHealthIMod", Pipboy::bKeepLowHealthIMod);
 
 			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
+			GetModSettingDouble("Pipboy", "fBackgroundViewportLeft", Pipboy::fBackgroundViewportLeft);
+			GetModSettingDouble("Pipboy", "fBackgroundViewportRight", Pipboy::fBackgroundViewportRight);
+			GetModSettingDouble("Pipboy", "fBackgroundViewportTop", Pipboy::fBackgroundViewportTop);
+			GetModSettingDouble("Pipboy", "fBackgroundViewportBottom", Pipboy::fBackgroundViewportBottom);
 			GetModSettingDouble("Pipboy", "fPipboyViewportLeft", Pipboy::fPipboyViewportLeft);
 			GetModSettingDouble("Pipboy", "fPipboyViewportRight", Pipboy::fPipboyViewportRight);
 			GetModSettingDouble("Pipboy", "fPipboyViewportTop", Pipboy::fPipboyViewportTop);
@@ -120,19 +128,6 @@ namespace MCM
 
 		static void ResetStatePost()
 		{
-			if (auto UI = RE::UI::GetSingleton())
-			{
-				if (auto PipboyBackgroundMenuSmall = UI->GetMenu("PipboyBackgroundMenuSmall"))
-				{
-					PipboyBackgroundMenuSmall->SetViewportRect({
-						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
-						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
-						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
-						static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom),
-					});
-				}
-			}
-
 			m_ini_base.Reset();
 			m_ini_user.Reset();
 		}
