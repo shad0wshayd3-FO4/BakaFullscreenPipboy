@@ -900,7 +900,6 @@ private:
 			return a_16x09;
 		}
 
-
 		inline static RE::NiRect<float> FullViewport{ 0.0f, 1.0f, 0.0f, 1.0f };
 
 	private:
@@ -1215,7 +1214,7 @@ private:
 
 					RE::Scaleform::GFx::Value root;
 					if (TerminalMenu->uiMovie
-						&& TerminalMenu->uiMovie->GetVariable(&root, "root"))
+					    && TerminalMenu->uiMovie->GetVariable(&root, "root"))
 					{
 						root.SetMember("x", MCM::Settings::Pipboy::fTerminalMenuX);
 						root.SetMember("y", MCM::Settings::Pipboy::fTerminalMenuY);
