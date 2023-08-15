@@ -232,11 +232,17 @@ public:
 						detail::SetColorHelper(PipboyMenu.get());
 					}
 
-					PipboyMenu->SetViewportRect(
-						{ static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
-					      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
-					      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
-					      static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom) });
+					PipboyMenu->SetViewportRect(detail::FullViewport);
+
+					RE::Scaleform::GFx::Value root;
+					if (PipboyMenu->uiMovie
+					    && PipboyMenu->uiMovie->GetVariable(&root, "root"))
+					{
+						root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
+						root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
+						root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScale);
+						root.SetMember("scaleY", MCM::Settings::Pipboy::fPipboyMenuScale);
+					}
 
 					Renderer->Enable();
 				}
@@ -662,14 +668,12 @@ private:
 				{
 					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 1.0f);
 					shaderFXObjects.push_back(filterHolder.get());
-				}
 
-				SetViewportRect({
-					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportLeft),
-					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportRight),
-					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportTop),
-					static_cast<float>(MCM::Settings::Pipboy::fBackgroundViewportBottom),
-				});
+					filterHolder->SetMember("x", MCM::Settings::Pipboy::fPipboyBackgroundX);
+					filterHolder->SetMember("y", MCM::Settings::Pipboy::fPipboyBackgroundY);
+					filterHolder->SetMember("scaleX", MCM::Settings::Pipboy::fPipboyBackgroundScale);
+					filterHolder->SetMember("scaleY", MCM::Settings::Pipboy::fPipboyBackgroundScale);
+				}
 			}
 
 			static RE::IMenu* Create(const RE::UIMessage&)
@@ -896,6 +900,10 @@ private:
 			return a_16x09;
 		}
 
+
+		inline static RE::NiRect<float> FullViewport{ 0.0f, 1.0f, 0.0f, 1.0f };
+
+	private:
 		static constexpr auto ratio_16x10{ 16.0 / 10.0 };
 		static constexpr auto ratio_21x09{ 21.0 / 09.0 };
 	};
@@ -1050,12 +1058,17 @@ private:
 			}
 
 			a_menu.customRendererName = detail::PipboyScreenModel::GetRendererName();
-			GameMenuBase->SetViewportRect({
-				static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportLeft),
-				static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportRight),
-				static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportTop),
-				static_cast<float>(MCM::Settings::Pipboy::fPipboyViewportBottom),
-			});
+			GameMenuBase->SetViewportRect(detail::FullViewport);
+
+			RE::Scaleform::GFx::Value root;
+			if (GameMenuBase->uiMovie
+			    && GameMenuBase->uiMovie->GetVariable(&root, "root"))
+			{
+				root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
+				root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
+				root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScale);
+				root.SetMember("scaleY", MCM::Settings::Pipboy::fPipboyMenuScale);
+			}
 		}
 
 		inline static REL::Relocation<decltype(&hkAddMenuToPipboy::AddMenuToPipboy)> _AddMenuToPipboy;
@@ -1189,26 +1202,30 @@ private:
 				return _SetViewport(a_this, a_ui, a_viewport);
 			}
 
-			if (MCM::Settings::Pipboy::bDisableFX
-			    && MCM::Settings::Pipboy::bUseColor)
+			if (auto UI = RE::UI::GetSingleton())
 			{
-				if (auto UI = RE::UI::GetSingleton())
+				if (auto TerminalMenu = UI->GetMenu<RE::TerminalMenu>())
 				{
-					if (auto TerminalMenu = UI->GetMenu<RE::TerminalMenu>())
+					if (MCM::Settings::Pipboy::bDisableFX
+					    && MCM::Settings::Pipboy::bUseColor)
 					{
 						detail::SetColorHelper(TerminalMenu.get());
 						TerminalMenu->UpdateFlag(RE::UI_MENU_FLAGS::kCustomRendering, false);
 					}
+
+					RE::Scaleform::GFx::Value root;
+					if (TerminalMenu->uiMovie
+						&& TerminalMenu->uiMovie->GetVariable(&root, "root"))
+					{
+						root.SetMember("x", MCM::Settings::Pipboy::fTerminalMenuX);
+						root.SetMember("y", MCM::Settings::Pipboy::fTerminalMenuY);
+						root.SetMember("scaleX", MCM::Settings::Pipboy::fTerminalMenuScale * 0.70);
+						root.SetMember("scaleY", MCM::Settings::Pipboy::fTerminalMenuScale);
+					}
 				}
 			}
 
-			RE::NiRect<float> viewport{
-				static_cast<float>(MCM::Settings::Pipboy::fTerminalViewportLeft),
-				static_cast<float>(MCM::Settings::Pipboy::fTerminalViewportRight),
-				static_cast<float>(MCM::Settings::Pipboy::fTerminalViewportTop),
-				static_cast<float>(MCM::Settings::Pipboy::fTerminalViewportBottom),
-			};
-			return _SetViewport(a_this, a_ui, viewport);
+			return _SetViewport(a_this, a_ui, detail::FullViewport);
 		}
 
 		inline static REL::Relocation<decltype(&hkSetViewport::SetViewport)> _SetViewport;

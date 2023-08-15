@@ -21,18 +21,15 @@ namespace MCM
 			inline static bool bPowerArmorOnly{ false };
 
 			inline static double fBackgroundAlpha{ 1.0 };
-			inline static double fBackgroundViewportLeft{ 0.0 };
-			inline static double fBackgroundViewportRight{ 1.0 };
-			inline static double fBackgroundViewportTop{ 0.02 };
-			inline static double fBackgroundViewportBottom{ 0.90 };
-			inline static double fPipboyViewportLeft{ 0.0 };
-			inline static double fPipboyViewportRight{ 1.0 };
-			inline static double fPipboyViewportTop{ 0.0 };
-			inline static double fPipboyViewportBottom{ 0.92 };
-			inline static double fTerminalViewportLeft{ 0.18 };
-			inline static double fTerminalViewportRight{ 0.82 };
-			inline static double fTerminalViewportTop{ 0.0 };
-			inline static double fTerminalViewportBottom{ 0.92 };
+			inline static double fPipboyMenuX{ 35.0 };
+			inline static double fPipboyMenuY{ 0.0 };
+			inline static double fPipboyMenuScale{ 0.92 };
+			inline static double fPipboyBackgroundX{ 42.0 };
+			inline static double fPipboyBackgroundY{ 0.0 };
+			inline static double fPipboyBackgroundScale{ 0.90 };
+			inline static double fTerminalMenuX{ 135.0 };
+			inline static double fTerminalMenuY{ 0.0 };
+			inline static double fTerminalMenuScale{ 0.92 };
 
 			inline static double fPipboy3DItemScale{ 0.6 };
 			inline static double fPipboy3DItemScreenPosX{ 0.68 };
@@ -70,18 +67,15 @@ namespace MCM
 			GetModSettingBool("Pipboy", "bPowerArmorOnly", Pipboy::bPowerArmorOnly);
 
 			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
-			GetModSettingDouble("Pipboy", "fBackgroundViewportLeft", Pipboy::fBackgroundViewportLeft);
-			GetModSettingDouble("Pipboy", "fBackgroundViewportRight", Pipboy::fBackgroundViewportRight);
-			GetModSettingDouble("Pipboy", "fBackgroundViewportTop", Pipboy::fBackgroundViewportTop);
-			GetModSettingDouble("Pipboy", "fBackgroundViewportBottom", Pipboy::fBackgroundViewportBottom);
-			GetModSettingDouble("Pipboy", "fPipboyViewportLeft", Pipboy::fPipboyViewportLeft);
-			GetModSettingDouble("Pipboy", "fPipboyViewportRight", Pipboy::fPipboyViewportRight);
-			GetModSettingDouble("Pipboy", "fPipboyViewportTop", Pipboy::fPipboyViewportTop);
-			GetModSettingDouble("Pipboy", "fPipboyViewportBottom", Pipboy::fPipboyViewportBottom);
-			GetModSettingDouble("Pipboy", "fTerminalViewportLeft", Pipboy::fTerminalViewportLeft);
-			GetModSettingDouble("Pipboy", "fTerminalViewportRight", Pipboy::fTerminalViewportRight);
-			GetModSettingDouble("Pipboy", "fTerminalViewportTop", Pipboy::fTerminalViewportTop);
-			GetModSettingDouble("Pipboy", "fTerminalViewportBottom", Pipboy::fTerminalViewportBottom);
+			GetModSettingDouble("Pipboy", "fPipboyMenuX", Pipboy::fPipboyMenuX);
+			GetModSettingDouble("Pipboy", "fPipboyMenuY", Pipboy::fPipboyMenuY);
+			GetModSettingDouble("Pipboy", "fPipboyMenuScale", Pipboy::fPipboyMenuScale);
+			GetModSettingDouble("Pipboy", "fPipboyBackgroundX", Pipboy::fPipboyBackgroundX);
+			GetModSettingDouble("Pipboy", "fPipboyBackgroundY", Pipboy::fPipboyBackgroundY);
+			GetModSettingDouble("Pipboy", "fPipboyBackgroundScale", Pipboy::fPipboyBackgroundScale);
+			GetModSettingDouble("Pipboy", "fTerminalMenuX", Pipboy::fTerminalMenuX);
+			GetModSettingDouble("Pipboy", "fTerminalMenuY", Pipboy::fTerminalMenuY);
+			GetModSettingDouble("Pipboy", "fTerminalMenuScale", Pipboy::fTerminalMenuScale);
 
 			GetModSettingDouble("Pipboy", "fPipboy3DItemScale", Pipboy::fPipboy3DItemScale);
 			GetModSettingDouble("Pipboy", "fPipboy3DItemScreenPosX", Pipboy::fPipboy3DItemScreenPosX);
