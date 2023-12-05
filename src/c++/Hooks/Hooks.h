@@ -240,8 +240,8 @@ public:
 					{
 						root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
 						root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
-						root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScale);
-						root.SetMember("scaleY", MCM::Settings::Pipboy::fPipboyMenuScale);
+						root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScaleX);
+						root.SetMember("scaleY", (MCM::Settings::Pipboy::fPipboyMenuScaleY > 0.0) ? MCM::Settings::Pipboy::fPipboyMenuScaleY : MCM::Settings::Pipboy::fPipboyMenuScaleX);
 					}
 
 					Renderer->Enable();
@@ -1065,8 +1065,8 @@ private:
 			{
 				root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
 				root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
-				root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScale);
-				root.SetMember("scaleY", MCM::Settings::Pipboy::fPipboyMenuScale);
+				root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScaleX);
+				root.SetMember("scaleY", (MCM::Settings::Pipboy::fPipboyMenuScaleY > 0.0) ? MCM::Settings::Pipboy::fPipboyMenuScaleY : MCM::Settings::Pipboy::fPipboyMenuScaleX);
 			}
 		}
 

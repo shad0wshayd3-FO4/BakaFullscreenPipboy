@@ -23,7 +23,8 @@ namespace MCM
 			inline static double fBackgroundAlpha{ 1.0 };
 			inline static double fPipboyMenuX{ 35.0 };
 			inline static double fPipboyMenuY{ 0.0 };
-			inline static double fPipboyMenuScale{ 0.92 };
+			inline static double fPipboyMenuScaleX{ 0.92 };
+			inline static double fPipboyMenuScaleY{ 0.0 };
 			inline static double fPipboyBackgroundX{ 42.0 };
 			inline static double fPipboyBackgroundY{ 0.0 };
 			inline static double fPipboyBackgroundScale{ 0.90 };
@@ -69,7 +70,8 @@ namespace MCM
 			GetModSettingDouble("Pipboy", "fBackgroundAlpha", Pipboy::fBackgroundAlpha);
 			GetModSettingDouble("Pipboy", "fPipboyMenuX", Pipboy::fPipboyMenuX);
 			GetModSettingDouble("Pipboy", "fPipboyMenuY", Pipboy::fPipboyMenuY);
-			GetModSettingDouble("Pipboy", "fPipboyMenuScale", Pipboy::fPipboyMenuScale);
+			GetModSettingDouble("Pipboy", "fPipboyMenuScaleX", Pipboy::fPipboyMenuScaleX);
+			GetModSettingDouble("Pipboy", "fPipboyMenuScaleY", Pipboy::fPipboyMenuScaleY);
 			GetModSettingDouble("Pipboy", "fPipboyBackgroundX", Pipboy::fPipboyBackgroundX);
 			GetModSettingDouble("Pipboy", "fPipboyBackgroundY", Pipboy::fPipboyBackgroundY);
 			GetModSettingDouble("Pipboy", "fPipboyBackgroundScale", Pipboy::fPipboyBackgroundScale);
