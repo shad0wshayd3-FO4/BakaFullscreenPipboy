@@ -7,8 +7,8 @@
 #include "RE/Fallout.h"
 
 #include <AutoTOML.hpp>
-#include <nlohmann/json.hpp>
 #include <SimpleIni.h>
+#include <nlohmann/json.hpp>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <xbyak/xbyak.h>
 

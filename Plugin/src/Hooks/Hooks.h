@@ -226,8 +226,7 @@ public:
 						PipboyManager->UpdateCursorConstraint(false);
 					}
 
-					if (MCM::Settings::Pipboy::bDisableFX
-					    && MCM::Settings::Pipboy::bUseColor)
+					if (MCM::Settings::Pipboy::bDisableFX && MCM::Settings::Pipboy::bUseColor)
 					{
 						detail::SetColorHelper(PipboyMenu.get());
 					}
@@ -235,8 +234,7 @@ public:
 					PipboyMenu->SetViewportRect(detail::FullViewport);
 
 					RE::Scaleform::GFx::Value root;
-					if (PipboyMenu->uiMovie
-					    && PipboyMenu->uiMovie->GetVariable(&root, "root"))
+					if (PipboyMenu->uiMovie && PipboyMenu->uiMovie->GetVariable(&root, "root"))
 					{
 						root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
 						root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
@@ -807,9 +805,7 @@ private:
 		{
 			if (auto PipboyManager = RE::PipboyManager::GetSingleton())
 			{
-				if (!MCM::Settings::QQuickBoy()
-				    || PipboyManager->menuToOpen == "GenericMenu"sv
-				    || PipboyManager->menuToOpen == "PipboyOpeningSequenceMenu"sv)
+				if (!MCM::Settings::QQuickBoy() || PipboyManager->menuToOpen == "GenericMenu"sv || PipboyManager->menuToOpen == "PipboyOpeningSequenceMenu"sv)
 				{
 					return true;
 				}
@@ -826,10 +822,7 @@ private:
 		{
 			if (auto PipboyManager = RE::PipboyManager::GetSingleton())
 			{
-				if (!PipboyManager->QPipboyActive()
-				    && (PipboyManager->menuToOpen == "PipboyHolotapeMenu"sv
-				        || PipboyManager->menuToOpen == "TerminalMenu"sv
-				        || PipboyManager->menuToOpen == "VoiceHolotape"sv))
+				if (!PipboyManager->QPipboyActive() && (PipboyManager->menuToOpen == "PipboyHolotapeMenu"sv || PipboyManager->menuToOpen == "TerminalMenu"sv || PipboyManager->menuToOpen == "VoiceHolotape"sv))
 				{
 					return true;
 				}
@@ -851,8 +844,7 @@ private:
 				a_menu->shaderFXObjects.push_back(a_menu->filterHolder.get());
 			}
 
-			if (MCM::Settings::Pipboy::bUseColorPA
-			    && RE::PowerArmor::PlayerInPowerArmor())
+			if (MCM::Settings::Pipboy::bUseColorPA && RE::PowerArmor::PlayerInPowerArmor())
 			{
 				a_menu->filterHolder->CreateAndSetFiltersToHUD(RE::HUDColorTypes::kPowerArmorColorOnly);
 			}
@@ -882,17 +874,14 @@ private:
 			const std::string_view& a_21x09 = ""sv)
 		{
 			auto State = RE::BSGraphics::State::GetSingleton();
-			auto ratio = static_cast<double>(State.backBufferWidth)
-			             / static_cast<double>(State.backBufferHeight);
+			auto ratio = static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight);
 
-			if (ratio == ratio_16x10
-			    && !a_16x10.empty())
+			if (ratio == ratio_16x10 && !a_16x10.empty())
 			{
 				return a_16x10;
 			}
 
-			if (ratio == ratio_21x09
-			    && !a_21x09.empty())
+			if (ratio == ratio_21x09 && !a_21x09.empty())
 			{
 				return a_21x09;
 			}
@@ -922,7 +911,7 @@ private:
 		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fUIFlatModel_TranslateZ{ REL::ID(48328) };
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkGetByName
 	{
 	public:
@@ -953,7 +942,7 @@ private:
 		inline static REL::Relocation<decltype(&hkGetByName::GetByName)> _GetByName;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkEnablePipboyShader
 	{
 	public:
@@ -992,7 +981,7 @@ private:
 		inline static REL::Relocation<decltype(&hkEnablePipboyShader::EnablePipboyShader)> _EnablePipboyShader;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkRefreshPipboyRenderSurface
 	{
 	public:
@@ -1021,7 +1010,7 @@ private:
 		inline static REL::Relocation<decltype(&hkRefreshPipboyRenderSurface::RefreshPipboyRenderSurface)> _RefreshPipboyRenderSurface;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF, bool COLOR>
+	template <std::uint64_t ID, std::ptrdiff_t OFF, bool COLOR>
 	class hkAddMenuToPipboy
 	{
 	public:
@@ -1050,8 +1039,7 @@ private:
 				return _AddMenuToPipboy(a_this, a_menu, a_standVP, a_powerVP);
 			}
 
-			if (MCM::Settings::Pipboy::bDisableFX
-			    && MCM::Settings::Pipboy::bUseColor)
+			if (MCM::Settings::Pipboy::bDisableFX && MCM::Settings::Pipboy::bUseColor)
 			{
 				detail::SetColorHelper(GameMenuBase, COLOR);
 			}
@@ -1060,8 +1048,7 @@ private:
 			GameMenuBase->SetViewportRect(detail::FullViewport);
 
 			RE::Scaleform::GFx::Value root;
-			if (GameMenuBase->uiMovie
-			    && GameMenuBase->uiMovie->GetVariable(&root, "root"))
+			if (GameMenuBase->uiMovie && GameMenuBase->uiMovie->GetVariable(&root, "root"))
 			{
 				root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
 				root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
@@ -1073,7 +1060,7 @@ private:
 		inline static REL::Relocation<decltype(&hkAddMenuToPipboy::AddMenuToPipboy)> _AddMenuToPipboy;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkPickScreen
 	{
 	public:
@@ -1108,7 +1095,7 @@ private:
 		inline static REL::Relocation<decltype(&hkPickScreen::PickScreen)> _PickScreen;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkGetObjectByName
 	{
 	public:
@@ -1148,7 +1135,7 @@ private:
 		inline static REL::Relocation<decltype(&hkGetObjectByName::GetObjectByName)> _GetObjectByName;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkGet3DRendererName
 	{
 	public:
@@ -1174,7 +1161,7 @@ private:
 		inline static REL::Relocation<decltype(&hkGet3DRendererName::Get3DRendererName)> _Get3DRendererName;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkSetViewport
 	{
 	public:
@@ -1205,16 +1192,14 @@ private:
 			{
 				if (auto TerminalMenu = UI->GetMenu<RE::TerminalMenu>())
 				{
-					if (MCM::Settings::Pipboy::bDisableFX
-					    && MCM::Settings::Pipboy::bUseColor)
+					if (MCM::Settings::Pipboy::bDisableFX && MCM::Settings::Pipboy::bUseColor)
 					{
 						detail::SetColorHelper(TerminalMenu.get());
 						TerminalMenu->UpdateFlag(RE::UI_MENU_FLAGS::kCustomRendering, false);
 					}
 
 					RE::Scaleform::GFx::Value root;
-					if (TerminalMenu->uiMovie
-					    && TerminalMenu->uiMovie->GetVariable(&root, "root"))
+					if (TerminalMenu->uiMovie && TerminalMenu->uiMovie->GetVariable(&root, "root"))
 					{
 						root.SetMember("x", MCM::Settings::Pipboy::fTerminalMenuX);
 						root.SetMember("y", MCM::Settings::Pipboy::fTerminalMenuY);
@@ -1230,7 +1215,7 @@ private:
 		inline static REL::Relocation<decltype(&hkSetViewport::SetViewport)> _SetViewport;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkSetCursorConstraintsRaw
 	{
 	public:
@@ -1266,7 +1251,7 @@ private:
 		inline static REL::Relocation<decltype(&hkSetCursorConstraintsRaw::SetCursorConstraints)> _SetCursorConstraints;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF, bool RETN>
+	template <std::uint64_t ID, std::ptrdiff_t OFF, bool RETN>
 	class hkQActorInPowerArmor
 	{
 	public:
@@ -1292,7 +1277,7 @@ private:
 		inline static REL::Relocation<decltype(&hkQActorInPowerArmor::QActorInPowerArmor)> _QActorInPowerArmor;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkQActorInPowerArmorRW
 	{
 	public:
@@ -1314,8 +1299,7 @@ private:
 
 			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
 			{
-				if (PlayerCamera->currentState
-				    && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				if (PlayerCamera->currentState && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
 				{
 					return true;
 				}
@@ -1327,7 +1311,7 @@ private:
 		inline static REL::Relocation<decltype(&hkQActorInPowerArmorRW::QActorInPowerArmor)> _QActorInPowerArmor;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkPlayPipboyLoadHolotapeAnim
 	{
 	public:
@@ -1356,8 +1340,7 @@ private:
 
 			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
 			{
-				if (PlayerCamera->currentState
-				    && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				if (PlayerCamera->currentState && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
 				{
 					return _PlayPipboyLoadHolotapeAnim(a_this, a_holotape, true);
 				}
@@ -1375,7 +1358,7 @@ private:
 		inline static REL::Relocation<decltype(&hkPlayPipboyLoadHolotapeAnim::PlayPipboyLoadHolotapeAnim)> _PlayPipboyLoadHolotapeAnim;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkLowerPipboy
 	{
 	public:
@@ -1434,9 +1417,7 @@ private:
 				return _ProcessEvent(a_this, a_event, a_source);
 			}
 
-			if (MCM::Settings::Runtime::bPlayClose
-			    && (a_event.tag == a_this->openAnimEvent
-			        || a_event.tag == "holotapeLoaded"sv))
+			if (MCM::Settings::Runtime::bPlayClose && (a_event.tag == a_this->openAnimEvent || a_event.tag == "holotapeLoaded"sv))
 			{
 				MCM::Settings::Runtime::bPlayClose = false;
 				if (auto PlayerControls = RE::PlayerControls::GetSingleton())
@@ -1455,7 +1436,7 @@ private:
 		inline static REL::Relocation<decltype(&ProcessEvent)> _ProcessEvent;
 	};
 
-	template<class T>
+	template <class T>
 	class hkProcessMessageT
 	{
 	public:
@@ -1477,34 +1458,34 @@ private:
 
 			switch (a_message.type.get())
 			{
-				case RE::UI_MESSAGE_TYPE::kShow:
-					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
+			case RE::UI_MESSAGE_TYPE::kShow:
+				if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
+				{
+					if (Renderer->enabled && MCM::Settings::Pipboy::bDisableFX)
 					{
-						if (Renderer->enabled && MCM::Settings::Pipboy::bDisableFX)
-						{
-							Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
-							Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kPipboy);
-							Renderer->customRenderTarget = 60;
-							Renderer->customSwapTarget = 62;
-						}
+						Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
+						Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kPipboy);
+						Renderer->customRenderTarget = 60;
+						Renderer->customSwapTarget = 62;
 					}
-					break;
+				}
+				break;
 
-				case RE::UI_MESSAGE_TYPE::kHide:
-					if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
+			case RE::UI_MESSAGE_TYPE::kHide:
+				if (auto Renderer = detail::PipboyScreenModel::GetRenderer())
+				{
+					if (Renderer->enabled && MCM::Settings::Pipboy::bDisableFX)
 					{
-						if (Renderer->enabled && MCM::Settings::Pipboy::bDisableFX)
-						{
-							Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
-							Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kHUDGlass);
-							Renderer->customRenderTarget = -1;
-							Renderer->customSwapTarget = -1;
-						}
+						Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
+						Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kHUDGlass);
+						Renderer->customRenderTarget = -1;
+						Renderer->customSwapTarget = -1;
 					}
-					break;
+				}
+				break;
 
-				default:
-					break;
+			default:
+				break;
 			}
 
 			return _ProcessMessage(a_this, a_message);
@@ -1513,7 +1494,7 @@ private:
 		inline static REL::Relocation<decltype(&ProcessMessage)> _ProcessMessage;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkPlayPipboyOpenAnim
 	{
 	public:
@@ -1554,7 +1535,7 @@ private:
 		inline static REL::Relocation<decltype(&hkPlayPipboyOpenAnim::PlayPipboyOpenAnim)> _PlayPipboyOpenAnim;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkOnPipboyOpenAnim
 	{
 	public:
@@ -1592,7 +1573,7 @@ private:
 		inline static REL::Relocation<decltype(&hkOnPipboyOpenAnim::OnPipboyOpenAnim)> _OnPipboyOpenAnim;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkPlayPipboyCloseAnim
 	{
 	public:
@@ -1644,7 +1625,7 @@ private:
 		inline static REL::Relocation<decltype(&hkPlayPipboyCloseAnim::PlayPipboyCloseAnim)> _PlayPipboyCloseAnim;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkOnPipboyCloseAnim
 	{
 	public:
@@ -1670,7 +1651,7 @@ private:
 		inline static REL::Relocation<decltype(&hkOnPipboyCloseAnim::OnPipboyCloseAnim)> _OnPipboyCloseAnim;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkStartPipboyMode
 	{
 	public:
@@ -1697,7 +1678,7 @@ private:
 		inline static REL::Relocation<decltype(&hkStartPipboyMode::StartPipboyMode)> _StartPipboyMode;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkStopPipboyMode
 	{
 	public:
@@ -1723,7 +1704,7 @@ private:
 		inline static REL::Relocation<decltype(&hkStopPipboyMode::StopPipboyMode)> _StopPipboyMode;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkSetWeaponBonesCulled
 	{
 	public:
@@ -1752,7 +1733,7 @@ private:
 		inline static REL::Relocation<decltype(&hkSetWeaponBonesCulled::SetWeaponBonesCulled)> _SetWeaponBonesCulled;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkDoAction
 	{
 	public:
@@ -1780,7 +1761,7 @@ private:
 		inline static REL::Relocation<decltype(&hkDoAction::DoAction)> _DoAction;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkQueueShowPipboy
 	{
 	public:
@@ -1807,7 +1788,7 @@ private:
 		inline static REL::Relocation<decltype(&hkQueueShowPipboy::QueueShowPipboy)> _QueueShowPipboy;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkQueueClosePipboy
 	{
 	public:
@@ -1833,7 +1814,7 @@ private:
 		inline static REL::Relocation<decltype(&hkQueueClosePipboy::QueueClosePipboy)> _QueueClosePipboy;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkSetEnableDynamicResolution
 	{
 	public:
@@ -1853,7 +1834,7 @@ private:
 		}
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkStopAnimationGraphListening
 	{
 	public:
@@ -1899,8 +1880,7 @@ private:
 			[[maybe_unused]] RE::IMenu* a_this,
 			[[maybe_unused]] const RE::InputEvent* a_event)
 		{
-			return _ShouldHandleEvent(a_this, a_event)
-			       && !MCM::Settings::Runtime::bQuickBoyTransition;
+			return _ShouldHandleEvent(a_this, a_event) && !MCM::Settings::Runtime::bQuickBoyTransition;
 		}
 
 		static void OnButtonEvent(
@@ -1912,8 +1892,7 @@ private:
 				return _OnButtonEvent(a_this, a_event);
 			}
 
-			if (a_event->QJustPressed()
-			    && (a_event->idCode == MCM::Settings::Runtime::QuickBoyKey))
+			if (a_event->QJustPressed() && (a_event->idCode == MCM::Settings::Runtime::QuickBoyKey))
 			{
 				ToggleQuickBoy();
 				return;
@@ -1926,7 +1905,7 @@ private:
 		inline static REL::Relocation<decltype(&OnButtonEvent)> _OnButtonEvent;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkSetModelScale
 	{
 	public:
@@ -1955,7 +1934,7 @@ private:
 		inline static REL::Relocation<decltype(&hkSetModelScale::SetModelScale)> _SetModelScale;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkSetModelScreenPosition
 	{
 	public:
@@ -1989,7 +1968,7 @@ private:
 		inline static REL::Relocation<decltype(&hkSetModelScreenPosition::SetModelScreenPosition)> _SetModelScreenPosition;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkKillScreenEffects
 	{
 	public:
@@ -2019,7 +1998,7 @@ private:
 		inline static REL::Relocation<decltype(&hkKillScreenEffects::KillScreenEffects)> _KillScreenEffects;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkInstanceFormTrigger
 	{
 	public:
@@ -2050,7 +2029,7 @@ private:
 		inline static REL::Relocation<decltype(&hkInstanceFormTrigger::InstanceFormTrigger)> _InstanceFormTrigger;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkShowPipboyLight
 	{
 	public:
@@ -2078,7 +2057,7 @@ private:
 		inline static REL::Relocation<decltype(&hkShowPipboyLight::ShowPipboyLight)> _ShowPipboyLight;
 	};
 
-	template<std::uint64_t ID, std::ptrdiff_t OFF>
+	template <std::uint64_t ID, std::ptrdiff_t OFF>
 	class hkRenderEffect
 	{
 	public:
@@ -2097,8 +2076,7 @@ private:
 			[[maybe_unused]] std::int32_t a_destTarget,
 			[[maybe_unused]] RE::ImageSpaceEffectParam* a_param)
 		{
-			if (MCM::Settings::Pipboy::bDisableFX
-			    && MCM::Settings::Pipboy::bDisableFXBoth)
+			if (MCM::Settings::Pipboy::bDisableFX && MCM::Settings::Pipboy::bDisableFXBoth)
 			{
 				return _RenderEffect(a_this, 0x48, a_sourceTarget, a_destTarget, a_param);
 			}

@@ -141,8 +141,7 @@ namespace MCM
 
 				for (auto& iter : data["keybinds"sv])
 				{
-					if (iter["id"sv] == "ToggleQuickBoy"
-					    && iter["modName"sv] == "BakaFullscreenPipboy")
+					if (iter["id"sv] == "ToggleQuickBoy" && iter["modName"sv] == "BakaFullscreenPipboy")
 					{
 						Runtime::QuickBoyKey = iter["keycode"sv];
 						break;
