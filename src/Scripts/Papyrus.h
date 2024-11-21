@@ -12,13 +12,13 @@ namespace Papyrus
 		{
 			a_vm->BindNativeMethod(CLASS_NAME, "UpdateSettings", UpdateSettings);
 			a_vm->BindNativeMethod(CLASS_NAME, "ToggleQuickBoy", ToggleQuickBoy);
-			logger::info(FMT_STRING("Registered funcs for class {:s}"sv), CLASS_NAME);
+			F4SE::log::info("Registered funcs for class {:s}"sv, CLASS_NAME);
 
 			return true;
 		}
 
 	private:
-		static constexpr char CLASS_NAME[] = "BakaFullscreenPipboy";
+		static constexpr auto CLASS_NAME{ "BakaFullscreenPipboy"sv };
 
 		static void UpdateSettings(std::monostate)
 		{

@@ -107,7 +107,7 @@ public:
 
 	static void ToggleQuickBoy()
 	{
-		if (!MCM::Settings::Pipboy::bEnable)
+		if (!MCM::Settings::Pipboy::bEnable.GetValue())
 		{
 			return;
 		}
@@ -216,17 +216,17 @@ public:
 						PipboyManager->inv3DModelManager.DisableRendering("InventoryMenu"sv);
 						PipboyManager->inv3DModelManager.str3DRendererName = detail::PipboyScreenModel::GetRendererName();
 						PipboyManager->inv3DModelManager.SetModelScale(
-							static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScale));
+							static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScale.GetValue()));
 						PipboyManager->inv3DModelManager.SetModelScreenPosition(
-							{ static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosX),
-						      static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosY),
+							{ static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosX.GetValue()),
+						      static_cast<float>(MCM::Settings::Pipboy::fPipboy3DItemScreenPosY.GetValue()),
 						      1.0f },
 							true);
 						PipboyManager->inv3DModelManager.EnableRendering("InventoryMenu"sv);
 						PipboyManager->UpdateCursorConstraint(false);
 					}
 
-					if (MCM::Settings::Pipboy::bDisableFX && MCM::Settings::Pipboy::bUseColor)
+					if (MCM::Settings::Pipboy::bDisableFX.GetValue() && MCM::Settings::Pipboy::bUseColor.GetValue())
 					{
 						detail::SetColorHelper(PipboyMenu.get());
 					}
@@ -236,10 +236,10 @@ public:
 					RE::Scaleform::GFx::Value root;
 					if (PipboyMenu->uiMovie && PipboyMenu->uiMovie->GetVariable(&root, "root"))
 					{
-						root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX);
-						root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY);
-						root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScale);
-						root.SetMember("scaleY", MCM::Settings::Pipboy::fPipboyMenuScale);
+						root.SetMember("x", MCM::Settings::Pipboy::fPipboyMenuX.GetValue());
+						root.SetMember("y", MCM::Settings::Pipboy::fPipboyMenuY.GetValue());
+						root.SetMember("scaleX", MCM::Settings::Pipboy::fPipboyMenuScale.GetValue());
+						root.SetMember("scaleY", MCM::Settings::Pipboy::fPipboyMenuScale.GetValue());
 					}
 
 					Renderer->Enable();
@@ -361,7 +361,7 @@ private:
 							"HUDShadowFlat:0",
 							"Materials\\Interface\\ModMenuShadow.BGEM");
 
-						if (MCM::Settings::Pipboy::bDisableFX)
+						if (MCM::Settings::Pipboy::bDisableFX.GetValue())
 						{
 							Renderer->Offscreen_SetRenderTargetSize(RE::Interface3D::OffscreenMenuSize::kFullFrame);
 							Renderer->Offscreen_SetPostEffect(RE::Interface3D::PostEffect::kHUDGlass);
@@ -481,7 +481,7 @@ private:
 					return RE::BSEventNotifyControl::kContinue;
 				}
 
-				if (!MCM::Settings::Pipboy::bBackground)
+				if (!MCM::Settings::Pipboy::bBackground.GetValue())
 				{
 					return RE::BSEventNotifyControl::kContinue;
 				}
@@ -493,7 +493,7 @@ private:
 					if (Renderer->enabled)
 					{
 						Renderer->MainScreen_SetOpacityAlpha(
-							static_cast<float>(MCM::Settings::Pipboy::fBackgroundAlpha));
+							static_cast<float>(MCM::Settings::Pipboy::fBackgroundAlpha.GetValue()));
 						Renderer->MainScreen_SetPostAA(RE::PowerArmor::PlayerInPowerArmor());
 						PipboyBackgroundMenu::ShowMenu();
 					}
@@ -567,7 +567,7 @@ private:
 				menuFlags.set(
 					RE::UI_MENU_FLAGS::kCustomRendering,
 					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
-				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
+				depthPriority = RE::UI_DEPTH_PRIORITY::kStandard;
 
 				auto& MoviePath =
 					GetAspectRatioString(
@@ -595,14 +595,14 @@ private:
 
 			static void ShowMenu()
 			{
-				if (!MCM::Settings::Pipboy::bBackground)
+				if (!MCM::Settings::Pipboy::bBackground.GetValue())
 				{
 					return;
 				}
 
 				if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 				{
-					if (!MCM::Settings::Pipboy::bBackgroundSmall)
+					if (!MCM::Settings::Pipboy::bBackgroundSmall.GetValue())
 					{
 						UIMessageQueue->AddMessage(
 							"PipboyBackgroundMenu",
@@ -619,14 +619,14 @@ private:
 
 			static void HideMenu()
 			{
-				if (!MCM::Settings::Pipboy::bBackground)
+				if (!MCM::Settings::Pipboy::bBackground.GetValue())
 				{
 					return;
 				}
 
 				if (auto UIMessageQueue = RE::UIMessageQueue::GetSingleton())
 				{
-					if (!MCM::Settings::Pipboy::bBackgroundSmall)
+					if (!MCM::Settings::Pipboy::bBackgroundSmall.GetValue())
 					{
 						UIMessageQueue->AddMessage(
 							"PipboyBackgroundMenu",
@@ -653,7 +653,7 @@ private:
 				menuFlags.set(
 					RE::UI_MENU_FLAGS::kCustomRendering,
 					RE::UI_MENU_FLAGS::kRendersUnderPauseMenu);
-				depthPriority.set(RE::UI_DEPTH_PRIORITY::kStandard);
+				depthPriority = RE::UI_DEPTH_PRIORITY::kStandard;
 
 				auto MoviePath = "Interface\\PipboyBackgroundMenuSmall.swf"sv;
 				const auto ScaleformManager = RE::BSScaleformManager::GetSingleton();
@@ -667,10 +667,10 @@ private:
 					filterHolder->CreateAndSetFiltersToColor(0, 0, 0, 1.0f);
 					shaderFXObjects.push_back(filterHolder.get());
 
-					filterHolder->SetMember("x", MCM::Settings::Pipboy::fPipboyBackgroundX);
-					filterHolder->SetMember("y", MCM::Settings::Pipboy::fPipboyBackgroundY);
-					filterHolder->SetMember("scaleX", MCM::Settings::Pipboy::fPipboyBackgroundScale);
-					filterHolder->SetMember("scaleY", MCM::Settings::Pipboy::fPipboyBackgroundScale);
+					filterHolder->SetMember("x", MCM::Settings::Pipboy::fPipboyBackgroundX.GetValue());
+					filterHolder->SetMember("y", MCM::Settings::Pipboy::fPipboyBackgroundY.GetValue());
+					filterHolder->SetMember("scaleX", MCM::Settings::Pipboy::fPipboyBackgroundScale.GetValue());
+					filterHolder->SetMember("scaleY", MCM::Settings::Pipboy::fPipboyBackgroundScale.GetValue());
 				}
 			}
 
@@ -809,7 +809,7 @@ private:
 				{
 					return true;
 				}
-				else if (MCM::Settings::Pipboy::bPowerArmorOnly && !RE::PowerArmor::PlayerInPowerArmor())
+				else if (MCM::Settings::Pipboy::bPowerArmorOnly.GetValue() && !RE::PowerArmor::PlayerInPowerArmor())
 				{
 					return true;
 				}
@@ -844,7 +844,7 @@ private:
 				a_menu->shaderFXObjects.push_back(a_menu->filterHolder.get());
 			}
 
-			if (MCM::Settings::Pipboy::bUseColorPA && RE::PowerArmor::PlayerInPowerArmor())
+			if (MCM::Settings::Pipboy::bUseColorPA.GetValue() && RE::PowerArmor::PlayerInPowerArmor())
 			{
 				a_menu->filterHolder->CreateAndSetFiltersToHUD(RE::HUDColorTypes::kPowerArmorColorOnly);
 			}
@@ -1887,7 +1887,7 @@ private:
 			[[maybe_unused]] RE::IMenu* a_this,
 			[[maybe_unused]] const RE::ButtonEvent* a_event)
 		{
-			if (!MCM::Settings::Pipboy::bQuickBoyKey)
+			if (!MCM::Settings::Pipboy::bQuickBoyKey.GetValue())
 			{
 				return _OnButtonEvent(a_this, a_event);
 			}
