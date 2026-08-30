@@ -31,11 +31,3 @@ target("BakaFullscreenPipboy")
 
     -- add extra files
     add_extrafiles(".clang-format")
-
-    -- add install files
-    add_installfiles("res/Interface/*.swf",          { prefixdir = "Interface" })
-    add_installfiles("res/Interface/**.txt",         { prefixdir = "Interface/Translations" })
-    add_installfiles("res/MCM/**.*",                 { prefixdir = "MCM/Config/BakaFullscreenPipboy" })
-    add_installfiles("res/Scripts/*.pex",            { prefixdir = "Scripts" })
-    add_installfiles("res/Scripts/**.psc",           { prefixdir = "Scripts/Source/Baka" })
-    add_installfiles("res/BakaFullscreenPipboy.esm", { prefixdir = "" })
