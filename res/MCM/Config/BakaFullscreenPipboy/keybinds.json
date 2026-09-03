@@ -1,0 +1,15 @@
+{
+    "modName": "BakaFullscreenPipboy",
+    "keybinds": [
+        {
+            "id": "ToggleQuickBoy",
+            "desc": "QuickBoy Toggle",
+            "action": {
+                "type": "CallGlobalFunction",
+                "script": "BakaFullscreenPipboy",
+                "function": "ToggleQuickBoy",
+                "params": []
+            }
+        }
+    ]
+}

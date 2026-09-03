@@ -668,7 +668,6 @@ private:
 						static REL::Relocation<func_t> func{ REL::ID(2201532) };
 						return func(a_source, a_sink);
 					}
-
 					// clang-format on
 
 				public:
@@ -710,7 +709,7 @@ private:
 				static void ForEachAnimationGraph(RE::BSAnimationGraphManager* a_this, functor_t& a_functor)
 				{
 					using func_t = decltype(&ForEachAnimationGraph);
-					REL::Relocation<func_t> func{ REL::ID(2225494) };
+					static REL::Relocation<func_t> func{ REL::ID(2225494) };
 					return func(a_this, a_functor);
 				}
 			};
@@ -788,17 +787,18 @@ private:
 			const std::string_view& a_16x10 = ""sv,
 			const std::string_view& a_21x09 = ""sv)
 		{
-			auto State = RE::BSGraphics::State::GetSingleton();
-			auto ratio = static_cast<double>(State.backBufferWidth) / static_cast<double>(State.backBufferHeight);
-
-			if (ratio == ratio_16x10 && !a_16x10.empty())
+			if (auto state = RE::BSGraphics::State::GetSingleton())
 			{
-				return a_16x10;
-			}
+				auto ratio = static_cast<double>(state->backBufferWidth) / static_cast<double>(state->backBufferHeight);
+				if (ratio == ratio_16x10 && !a_16x10.empty())
+				{
+					return a_16x10;
+				}
 
-			if (ratio == ratio_21x09 && !a_21x09.empty())
-			{
-				return a_21x09;
+				if (ratio == ratio_21x09 && !a_21x09.empty())
+				{
+					return a_21x09;
+				}
 			}
 
 			return a_16x09;
@@ -826,8 +826,7 @@ private:
 		inline static REL::Relocation<RE::SettingT<RE::INISettingCollection>*> fUIFlatModel_TranslateZ{ REL::ID(48328) };
 	};
 
-	class hkGetByName :
-		public REX::Singleton<hkGetByName>
+	class hkGetByName
 	{
 	private:
 		static RE::Interface3D::Renderer* GetByName(
@@ -846,23 +845,22 @@ private:
 			return detail::PipboyScreenModel::GetRenderer();
 		}
 
-		inline static REL::Hook _GetByName00{ REL::ID(2225504), 0x36, GetByName };  // PipboyManager::~PipboyManager
-		inline static REL::Hook _GetByName01{ REL::ID(2225455), 0x25, GetByName };  // PipboyManager::RaisePipboy
-		inline static REL::Hook _GetByName02{ REL::ID(2225458), 0x9D, GetByName };  // PipboyManager::OnPipboyClosed
-		inline static REL::Hook _GetByName03{ REL::ID(2225468), 0x11, GetByName };  // PipboyManager::EnableRenderer
-		inline static REL::Hook _GetByName04{ REL::ID(2225469), 0x0C, GetByName };  // PipboyManager::GetRendererEnabled
-		inline static REL::Hook _GetByName05{ REL::ID(2225472), 0x0C, GetByName };  // PipboyManager::TriggerLargeBurst
-		inline static REL::Hook _GetByName06{ REL::ID(2225473), 0x0C, GetByName };  // PipboyManager::TriggerSmallBurst
-		inline static REL::Hook _GetByName07{ REL::ID(2225474), 0x0C, GetByName };  // PipboyManager::TriggerShudder
-		inline static REL::Hook _GetByName08{ REL::ID(2225475), 0x0C, GetByName };  // PipboyManager::TriggerVHold
-		inline static REL::Hook _GetByName09{ REL::ID(2225476), 0x0C, GetByName };  // PipboyManager::TriggerVScan
-		inline static REL::Hook _GetByName0A{ REL::ID(2225477), 0x0C, GetByName };  // PipboyManager::TriggerFlicker
-		inline static REL::Hook _GetByName0B{ REL::ID(2225480), 0x9D, GetByName };  // PipboyManager::ClosedownPipboy
-		inline static REL::Hook _GetByName0C{ REL::ID(2225486), 0x3A, GetByName };  // PipboyManager::ProcessLoweringReason
+		inline static REL::THook _GetByName00{ REL::ID(2225504), 0x36, GetByName };  // PipboyManager::~PipboyManager
+		inline static REL::THook _GetByName01{ REL::ID(2225455), 0x25, GetByName };  // PipboyManager::RaisePipboy
+		inline static REL::THook _GetByName02{ REL::ID(2225458), 0x9D, GetByName };  // PipboyManager::OnPipboyClosed
+		inline static REL::THook _GetByName03{ REL::ID(2225468), 0x11, GetByName };  // PipboyManager::EnableRenderer
+		inline static REL::THook _GetByName04{ REL::ID(2225469), 0x0C, GetByName };  // PipboyManager::GetRendererEnabled
+		inline static REL::THook _GetByName05{ REL::ID(2225472), 0x0C, GetByName };  // PipboyManager::TriggerLargeBurst
+		inline static REL::THook _GetByName06{ REL::ID(2225473), 0x0C, GetByName };  // PipboyManager::TriggerSmallBurst
+		inline static REL::THook _GetByName07{ REL::ID(2225474), 0x0C, GetByName };  // PipboyManager::TriggerShudder
+		inline static REL::THook _GetByName08{ REL::ID(2225475), 0x0C, GetByName };  // PipboyManager::TriggerVHold
+		inline static REL::THook _GetByName09{ REL::ID(2225476), 0x0C, GetByName };  // PipboyManager::TriggerVScan
+		inline static REL::THook _GetByName0A{ REL::ID(2225477), 0x0C, GetByName };  // PipboyManager::TriggerFlicker
+		inline static REL::THook _GetByName0B{ REL::ID(2225480), 0x9D, GetByName };  // PipboyManager::ClosedownPipboy
+		inline static REL::THook _GetByName0C{ REL::ID(2225486), 0x3A, GetByName };  // PipboyManager::ProcessLoweringReason
 	};
 
-	class hkEnablePipboyShader :
-		public REX::Singleton<hkEnablePipboyShader>
+	class hkEnablePipboyShader
 	{
 	private:
 		static void EnablePipboyShader(
@@ -889,11 +887,10 @@ private:
 			Renderer->Enable();
 		}
 
-		inline static REL::Hook _EnablePipboyShader0{ REL::ID(2225479), 0x28A, EnablePipboyShader };  // PipboyManager::InitPipboy
+		inline static REL::THook _EnablePipboyShader0{ REL::ID(2225479), 0x28A, EnablePipboyShader };  // PipboyManager::InitPipboy
 	};
 
-	class hkRefreshPipboyRenderSurface :
-		public REX::Singleton<hkRefreshPipboyRenderSurface>
+	class hkRefreshPipboyRenderSurface
 	{
 	private:
 		static void RefreshPipboyRenderSurface(
@@ -910,11 +907,10 @@ private:
 			}
 		}
 
-		inline static REL::Hook _RefreshPipboyRenderSurface0{ REL::ID(2232942), 0xBF, RefreshPipboyRenderSurface };  // PlayerCharacter::SetRefraction
+		inline static REL::THook _RefreshPipboyRenderSurface0{ REL::ID(2232942), 0xBF, RefreshPipboyRenderSurface };  // PlayerCharacter::SetRefraction
 	};
 
-	class hkAddMenuToPipboy :
-		public REX::Singleton<hkAddMenuToPipboy>
+	class hkAddMenuToPipboy
 	{
 	private:
 		template <bool COLOR>
@@ -958,13 +954,12 @@ private:
 			}
 		}
 
-		inline static REL::Hook _AddMenuToPipboy0{ REL::ID(2223215), 0x178, AddMenuToPipboy<true> };   // GenericMenu::GenericMenu
-		inline static REL::Hook _AddMenuToPipboy1{ REL::ID(2224049), 0x0E1, AddMenuToPipboy<false> };  // PipboyHolotapeMenu::PipboyHolotapeMenu
-		inline static REL::Hook _AddMenuToPipboy2{ REL::ID(2224179), 0x317, AddMenuToPipboy<true> };   // PipboyMenu::PipboyMenu
+		inline static REL::THook _AddMenuToPipboy0{ REL::ID(2223215), 0x178, AddMenuToPipboy<true> };   // GenericMenu::GenericMenu
+		inline static REL::THook _AddMenuToPipboy1{ REL::ID(2224049), 0x0E1, AddMenuToPipboy<false> };  // PipboyHolotapeMenu::PipboyHolotapeMenu
+		inline static REL::THook _AddMenuToPipboy2{ REL::ID(2224179), 0x317, AddMenuToPipboy<true> };   // PipboyMenu::PipboyMenu
 	};
 
-	class hkPickScreen :
-		public REX::Singleton<hkPickScreen>
+	class hkPickScreen
 	{
 	private:
 		static bool PickScreen(
@@ -987,12 +982,11 @@ private:
 			return _PickScreen0(Renderer->nativeAspect.get(), false, 0.0f, 0.0f);
 		}
 
-		inline static REL::Hook _PickScreen0{ REL::ID(2224181), 0x513, PickScreen };  // PipboyMenu::ProcessMessage
-		inline static REL::Hook _PickScreen1{ REL::ID(2224614), 0x8AD, PickScreen };  // TerminalMenu::ProcessMessage
+		inline static REL::THook _PickScreen0{ REL::ID(2224181), 0x513, PickScreen };  // PipboyMenu::ProcessMessage
+		inline static REL::THook _PickScreen1{ REL::ID(2224614), 0x8AD, PickScreen };  // TerminalMenu::ProcessMessage
 	};
 
-	class hkGetObjectByName :
-		public REX::Singleton<hkGetObjectByName>
+	class hkGetObjectByName
 	{
 	private:
 		static RE::NiNode* GetObjectByName(
@@ -1020,12 +1014,11 @@ private:
 				a_defer);
 		}
 
-		inline static REL::Hook _GetObjectByName0{ REL::ID(2224181), 0x4D6, GetObjectByName };  // PipboyMenu::ProcessMessage
-		inline static REL::Hook _GetObjectByName1{ REL::ID(2224614), 0x875, GetObjectByName };  // TerminalMenu::ProcessMessage
+		inline static REL::THook _GetObjectByName0{ REL::ID(2224181), 0x4D6, GetObjectByName };  // PipboyMenu::ProcessMessage
+		inline static REL::THook _GetObjectByName1{ REL::ID(2224614), 0x875, GetObjectByName };  // TerminalMenu::ProcessMessage
 	};
 
-	class hkGet3DRendererName :
-		public REX::Singleton<hkGet3DRendererName>
+	class hkGet3DRendererName
 	{
 	private:
 		static const RE::BSFixedString& Get3DRendererName(
@@ -1039,12 +1032,11 @@ private:
 			return detail::PipboyScreenModel::GetRendererName();
 		}
 
-		inline static REL::Hook _Get3DRendererName0{ REL::ID(2224181), 0x365, Get3DRendererName };  // PipboyMenu::ProcessMessage
-		inline static REL::Hook _Get3DRendererName1{ REL::ID(2224616), 0x25F, Get3DRendererName };  // TerminalMenu::InitMenu
+		inline static REL::THook _Get3DRendererName0{ REL::ID(2224181), 0x365, Get3DRendererName };  // PipboyMenu::ProcessMessage
+		inline static REL::THook _Get3DRendererName1{ REL::ID(2224616), 0x25F, Get3DRendererName };  // TerminalMenu::InitMenu
 	};
 
-	class hkSetViewport :
-		public REX::Singleton<hkSetViewport>
+	class hkSetViewport
 	{
 	private:
 		static void SetViewport(
@@ -1086,11 +1078,10 @@ private:
 			return _SetViewport0(a_this, a_ui, detail::FullViewport);
 		}
 
-		inline static REL::Hook _SetViewport0{ REL::ID(2224616), 0x3C9, SetViewport };  // TerminalMenu::InitMenu
+		inline static REL::THook _SetViewport0{ REL::ID(2224616), 0x3C9, SetViewport };  // TerminalMenu::InitMenu
 	};
 
-	class hkSetCursorConstraintsRaw :
-		public REX::Singleton<hkSetCursorConstraintsRaw>
+	class hkSetCursorConstraintsRaw
 	{
 	private:
 		static void SetCursorConstraintsRaw(
@@ -1114,16 +1105,15 @@ private:
 			MenuCursor->ClearConstraints();
 		}
 
-		inline static REL::Hook _SetCursorConstraintsRaw0{ REL::ID(2225455), 0x07E, SetCursorConstraintsRaw };  // PipboyManager::RaisePipboy
-		inline static REL::Hook _SetCursorConstraintsRaw1{ REL::ID(2225455), 0x0A3, SetCursorConstraintsRaw };  // PipboyManager::RaisePipboy
-		inline static REL::Hook _SetCursorConstraintsRaw2{ REL::ID(2225479), 0x2D4, SetCursorConstraintsRaw };  // PipboyManager::InitPipboy
-		inline static REL::Hook _SetCursorConstraintsRaw3{ REL::ID(2225479), 0x2F9, SetCursorConstraintsRaw };  // PipboyManager::InitPipboy
-		inline static REL::Hook _SetCursorConstraintsRaw4{ REL::ID(2225488), 0x04D, SetCursorConstraintsRaw };  // PipboyManager::UpdateCursorConstraint
-		inline static REL::Hook _SetCursorConstraintsRaw5{ REL::ID(2225488), 0x075, SetCursorConstraintsRaw };  // PipboyManager::UpdateCursorConstraint
+		inline static REL::THook _SetCursorConstraintsRaw0{ REL::ID(2225455), 0x07E, SetCursorConstraintsRaw };  // PipboyManager::RaisePipboy
+		inline static REL::THook _SetCursorConstraintsRaw1{ REL::ID(2225455), 0x0A3, SetCursorConstraintsRaw };  // PipboyManager::RaisePipboy
+		inline static REL::THook _SetCursorConstraintsRaw2{ REL::ID(2225479), 0x2D4, SetCursorConstraintsRaw };  // PipboyManager::InitPipboy
+		inline static REL::THook _SetCursorConstraintsRaw3{ REL::ID(2225479), 0x2F9, SetCursorConstraintsRaw };  // PipboyManager::InitPipboy
+		inline static REL::THook _SetCursorConstraintsRaw4{ REL::ID(2225488), 0x04D, SetCursorConstraintsRaw };  // PipboyManager::UpdateCursorConstraint
+		inline static REL::THook _SetCursorConstraintsRaw5{ REL::ID(2225488), 0x075, SetCursorConstraintsRaw };  // PipboyManager::UpdateCursorConstraint
 	};
 
-	class hkQActorInPowerArmor :
-		public REX::Singleton<hkQActorInPowerArmor>
+	class hkQActorInPowerArmor
 	{
 	private:
 		static bool QActorInPowerArmor(
@@ -1137,14 +1127,13 @@ private:
 			return true;
 		}
 
-		inline static REL::Hook _QActorInPowerArmor0{ REL::ID(2225447), 0x29, QActorInPowerArmor };  // PipboyManager::PlayPipboyGenericOpenAnim
-		inline static REL::Hook _QActorInPowerArmor1{ REL::ID(2225454), 0x46, QActorInPowerArmor };  // PipboyManager::LowerPipboy
-		inline static REL::Hook _QActorInPowerArmor2{ REL::ID(2225455), 0xC6, QActorInPowerArmor };  // PipboyManager::RaisePipboy
-		inline static REL::Hook _QActorInPowerArmor3{ REL::ID(2225486), 0x29, QActorInPowerArmor };  // PipboyManager::ProcessLoweringReason
+		inline static REL::THook _QActorInPowerArmor0{ REL::ID(2225447), 0x29, QActorInPowerArmor };  // PipboyManager::PlayPipboyGenericOpenAnim
+		inline static REL::THook _QActorInPowerArmor1{ REL::ID(2225454), 0x46, QActorInPowerArmor };  // PipboyManager::LowerPipboy
+		inline static REL::THook _QActorInPowerArmor2{ REL::ID(2225455), 0xC6, QActorInPowerArmor };  // PipboyManager::RaisePipboy
+		inline static REL::THook _QActorInPowerArmor3{ REL::ID(2225486), 0x29, QActorInPowerArmor };  // PipboyManager::ProcessLoweringReason
 	};
 
-	class hkQActorInPowerArmorRW :
-		public REX::Singleton<hkQActorInPowerArmorRW>
+	class hkQActorInPowerArmorRW
 	{
 	private:
 		static bool QActorInPowerArmor(
@@ -1157,7 +1146,7 @@ private:
 
 			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
 			{
-				if (PlayerCamera->currentState && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				if (PlayerCamera->currentState && PlayerCamera->currentState->id.underlying() >= RE::CameraState::k3rdPerson)
 				{
 					return true;
 				}
@@ -1166,11 +1155,10 @@ private:
 			return _QActorInPowerArmor0(a_actor);
 		}
 
-		inline static REL::Hook _QActorInPowerArmor0{ REL::ID(2234886), 0x155, QActorInPowerArmor };  // ReadyWeaponHandler::HandleEvent
+		inline static REL::THook _QActorInPowerArmor0{ REL::ID(2234886), 0x155, QActorInPowerArmor };  // ReadyWeaponHandler::HandleEvent
 	};
 
-	class hkPlayPipboyLoadHolotapeAnim :
-		public REX::Singleton<hkPlayPipboyLoadHolotapeAnim>
+	class hkPlayPipboyLoadHolotapeAnim
 	{
 	private:
 		static void PlayPipboyLoadHolotapeAnim(
@@ -1190,7 +1178,7 @@ private:
 
 			if (auto PlayerCamera = RE::PlayerCamera::GetSingleton())
 			{
-				if (PlayerCamera->currentState && PlayerCamera->currentState->id >= RE::CameraState::k3rdPerson)
+				if (PlayerCamera->currentState && PlayerCamera->currentState->id.underlying() >= RE::CameraState::k3rdPerson)
 				{
 					return _PlayPipboyLoadHolotapeAnim0(a_this, a_holotape, true);
 				}
@@ -1205,13 +1193,12 @@ private:
 			_PlayPipboyLoadHolotapeAnim0(a_this, a_holotape, true);
 		}
 
-		inline static REL::Hook _PlayPipboyLoadHolotapeAnim0{ REL::ID(2224162), 0x147, PlayPipboyLoadHolotapeAnim };  // unk
-		inline static REL::Hook _PlayPipboyLoadHolotapeAnim1{ REL::ID(2224169), 0x09E, PlayPipboyLoadHolotapeAnim };  // PipboyInventoryMenu::PlayHolotape
-		inline static REL::Hook _PlayPipboyLoadHolotapeAnim2{ REL::ID(2234886), 0x1B3, PlayPipboyLoadHolotapeAnim };  // ReadyWeaponHandler::HandleEvent
+		inline static REL::THook _PlayPipboyLoadHolotapeAnim0{ REL::ID(2224162), 0x147, PlayPipboyLoadHolotapeAnim };  // unk
+		inline static REL::THook _PlayPipboyLoadHolotapeAnim1{ REL::ID(2224169), 0x09E, PlayPipboyLoadHolotapeAnim };  // PipboyInventoryMenu::PlayHolotape
+		inline static REL::THook _PlayPipboyLoadHolotapeAnim2{ REL::ID(2234886), 0x1B3, PlayPipboyLoadHolotapeAnim };  // ReadyWeaponHandler::HandleEvent
 	};
 
-	class hkLowerPipboy :
-		public REX::Singleton<hkLowerPipboy>
+	class hkLowerPipboy
 	{
 	private:
 		static void LowerPipboy(
@@ -1233,12 +1220,11 @@ private:
 			_LowerPipboy0(a_this, a_reason);
 		}
 
-		inline static REL::Hook _LowerPipboy0{ REL::ID(2223010), 0x0AC, LowerPipboy };  // ExamineMenu::ShowInspectMenu
-		inline static REL::Hook _LowerPipboy1{ REL::ID(2248510), 0x1C3, LowerPipboy };  // BookMenu::OpenBookMenu
+		inline static REL::THook _LowerPipboy0{ REL::ID(2223010), 0x0AC, LowerPipboy };  // ExamineMenu::ShowInspectMenu
+		inline static REL::THook _LowerPipboy1{ REL::ID(2248510), 0x1C3, LowerPipboy };  // BookMenu::OpenBookMenu
 	};
 
-	class hkProcessEvent :
-		public REX::Singleton<hkProcessEvent>
+	class hkProcessEvent
 	{
 	private:
 		static RE::BSEventNotifyControl ProcessEvent(
@@ -1276,11 +1262,10 @@ private:
 			return RE::BSEventNotifyControl::kContinue;
 		}
 
-		inline static REL::HookVFT _ProcessEvent0{ RE::PipboyManager::VTABLE[0], 0x01, ProcessEvent };
+		inline static REL::THookVFT _ProcessEvent0{ RE::PipboyManager::VTABLE[0], 0x01, ProcessEvent };
 	};
 
-	class hkProcessMessage :
-		public REX::Singleton<hkProcessMessage>
+	class hkProcessMessage
 	{
 	private:
 		static RE::UI_MESSAGE_RESULTS ProcessMessage(
@@ -1327,11 +1312,10 @@ private:
 			return _ProcessMessage0(a_this, a_message);
 		}
 
-		inline static REL::HookVFT _ProcessMessage0{ RE::PipboyHolotapeMenu::VTABLE[0], 0x03, ProcessMessage };
+		inline static REL::THookVFT _ProcessMessage0{ RE::PipboyHolotapeMenu::VTABLE[0], 0x03, ProcessMessage };
 	};
 
-	class hkPlayPipboyOpenAnim :
-		public REX::Singleton<hkPlayPipboyOpenAnim>
+	class hkPlayPipboyOpenAnim
 	{
 	private:
 		static void PlayPipboyOpenAnim(
@@ -1359,13 +1343,12 @@ private:
 			}
 		}
 
-		inline static REL::Hook _PlayPipboyOpenAnim0{ REL::ID(2219795), 0x134, PlayPipboyOpenAnim };  // UseItemCommand::DoExecute
-		// inline static REL::Hook _PlayPipboyOpenAnim1{ REL::ID(743427), 0x020, PlayPipboyOpenAnim };   // PipboyManager::PlayPipboyOpenTerminalAnim - inlined (maybe unused)
-		inline static REL::Hook _PlayPipboyOpenAnim2{ REL::ID(2249426), 0x32F, PlayPipboyOpenAnim };  // PipboyHandler::HandleEvent
+		inline static REL::THook _PlayPipboyOpenAnim0{ REL::ID(2219795), 0x134, PlayPipboyOpenAnim };  // UseItemCommand::DoExecute
+		// inline static REL::THook _PlayPipboyOpenAnim1{ REL::ID(743427), 0x020, PlayPipboyOpenAnim };   // PipboyManager::PlayPipboyOpenTerminalAnim - inlined (maybe unused)
+		inline static REL::THook _PlayPipboyOpenAnim2{ REL::ID(2249426), 0x32F, PlayPipboyOpenAnim };  // PipboyHandler::HandleEvent
 	};
 
-	class hkOnPipboyOpenAnim :
-		public REX::Singleton<hkOnPipboyOpenAnim>
+	class hkOnPipboyOpenAnim
 	{
 	private:
 		static void OnPipboyOpenAnim(
@@ -1391,13 +1374,12 @@ private:
 			a_this->OnPipboyOpened();
 		}
 
-		inline static REL::Hook _OnPipboyOpenAnim0{ REL::ID(2225446), 0x0247, OnPipboyOpenAnim };  // PipboyManager::PlayPipboyLoadHolotapeAnim
-		inline static REL::Hook _OnPipboyOpenAnim1{ REL::ID(2225447), 0x00A4, OnPipboyOpenAnim };  // PipboyManager::PlayPipboyGenericOpenAnim
-		inline static REL::Hook _OnPipboyOpenAnim2{ REL::ID(2229323), 0x2878, OnPipboyOpenAnim };  // TaskQueueInterface::TaskUnpackFunc
+		inline static REL::THook _OnPipboyOpenAnim0{ REL::ID(2225446), 0x0247, OnPipboyOpenAnim };  // PipboyManager::PlayPipboyLoadHolotapeAnim
+		inline static REL::THook _OnPipboyOpenAnim1{ REL::ID(2225447), 0x00A4, OnPipboyOpenAnim };  // PipboyManager::PlayPipboyGenericOpenAnim
+		inline static REL::THook _OnPipboyOpenAnim2{ REL::ID(2229323), 0x2878, OnPipboyOpenAnim };  // TaskQueueInterface::TaskUnpackFunc
 	};
 
-	class hkPlayPipboyCloseAnim :
-		public REX::Singleton<hkPlayPipboyCloseAnim>
+	class hkPlayPipboyCloseAnim
 	{
 	private:
 		static void PlayPipboyCloseAnim(
@@ -1447,16 +1429,15 @@ private:
 			}
 		}
 
-		inline static REL::Hook _PlayPipboyCloseAnim0{ REL::ID(2223217), 0x03F, PlayPipboyCloseAnim };  // GenericMenu::ProcessMessage
-		inline static REL::Hook _PlayPipboyCloseAnim1{ REL::ID(2224181), 0x21D, PlayPipboyCloseAnim };  // PipboyMenu::ProcessMessage
-		inline static REL::Hook _PlayPipboyCloseAnim2{ REL::ID(2224181), 0x230, PlayPipboyCloseAnim };  // PipboyMenu::ProcessMessage
-		inline static REL::Hook _PlayPipboyCloseAnim3{ REL::ID(2224614), 0x346, PlayPipboyCloseAnim };  // TerminalMenu::ProcessMessage
-		inline static REL::Hook _PlayPipboyCloseAnim4{ REL::ID(2231392), 0x232, PlayPipboyCloseAnim };  // unk
-		inline static REL::Hook _PlayPipboyCloseAnim5{ REL::ID(2231408), 0x105, PlayPipboyCloseAnim };  // ActorEquipManager::UseObject
+		inline static REL::THook _PlayPipboyCloseAnim0{ REL::ID(2223217), 0x03F, PlayPipboyCloseAnim };  // GenericMenu::ProcessMessage
+		inline static REL::THook _PlayPipboyCloseAnim1{ REL::ID(2224181), 0x21D, PlayPipboyCloseAnim };  // PipboyMenu::ProcessMessage
+		inline static REL::THook _PlayPipboyCloseAnim2{ REL::ID(2224181), 0x230, PlayPipboyCloseAnim };  // PipboyMenu::ProcessMessage
+		inline static REL::THook _PlayPipboyCloseAnim3{ REL::ID(2224614), 0x346, PlayPipboyCloseAnim };  // TerminalMenu::ProcessMessage
+		inline static REL::THook _PlayPipboyCloseAnim4{ REL::ID(2231392), 0x232, PlayPipboyCloseAnim };  // unk
+		inline static REL::THook _PlayPipboyCloseAnim5{ REL::ID(2231408), 0x105, PlayPipboyCloseAnim };  // ActorEquipManager::UseObject
 	};
 
-	class hkOnPipboyCloseAnim :
-		public REX::Singleton<hkOnPipboyCloseAnim>
+	class hkOnPipboyCloseAnim
 	{
 	private:
 		static void OnPipboyCloseAnim(
@@ -1470,11 +1451,10 @@ private:
 			return _OnPipboyCloseAnim0(a_this);
 		}
 
-		inline static REL::Hook _OnPipboyCloseAnim0{ REL::ID(2229323), 0x28B3, OnPipboyCloseAnim };  // TaskQueueInterface::TaskUnpackFunc
+		inline static REL::THook _OnPipboyCloseAnim0{ REL::ID(2229323), 0x28B3, OnPipboyCloseAnim };  // TaskQueueInterface::TaskUnpackFunc
 	};
 
-	class hkStartPipboyMode : 
-		public REX::Singleton<hkStartPipboyMode>
+	class hkStartPipboyMode
 	{
 	private:
 		static void StartPipboyMode(
@@ -1489,14 +1469,13 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _StartPipboyMode0{ REL::ID(2225444), 0x05D, StartPipboyMode };  // PipboyManager::PlayPipboyOpenAnim
-		inline static REL::Hook _StartPipboyMode1{ REL::ID(2225445), 0x069, StartPipboyMode };  // PipboyManager::PlayPipboyOpenTerminalAnim
-		inline static REL::Hook _StartPipboyMode2{ REL::ID(2225446), 0x1A2, StartPipboyMode };  // PipboyManager::PlayPipboyLoadHolotapeAnim
-		inline static REL::Hook _StartPipboyMode3{ REL::ID(2225447), 0x07B, StartPipboyMode };  // PipboyManager::PlayPipboyGenericOpenAnim
+		inline static REL::THook _StartPipboyMode0{ REL::ID(2225444), 0x05D, StartPipboyMode };  // PipboyManager::PlayPipboyOpenAnim
+		inline static REL::THook _StartPipboyMode1{ REL::ID(2225445), 0x069, StartPipboyMode };  // PipboyManager::PlayPipboyOpenTerminalAnim
+		inline static REL::THook _StartPipboyMode2{ REL::ID(2225446), 0x1A2, StartPipboyMode };  // PipboyManager::PlayPipboyLoadHolotapeAnim
+		inline static REL::THook _StartPipboyMode3{ REL::ID(2225447), 0x07B, StartPipboyMode };  // PipboyManager::PlayPipboyGenericOpenAnim
 	};
 
-	class hkStopPipboyMode :
-		public REX::Singleton<hkStopPipboyMode>
+	class hkStopPipboyMode
 	{
 	private:
 		static void StopPipboyMode(
@@ -1510,13 +1489,12 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _StopPipboyMode0{ REL::ID(2225449), 0x10, StopPipboyMode };  // PipboyManager::OnPipboyOpenAnimFailed
-		inline static REL::Hook _StopPipboyMode1{ REL::ID(2225458), 0x90, StopPipboyMode };  // PipboyManager::OnPipboyClosed
-		inline static REL::Hook _StopPipboyMode2{ REL::ID(2225480), 0x90, StopPipboyMode };  // PipboyManager::ClosedownPipboy
+		inline static REL::THook _StopPipboyMode0{ REL::ID(2225449), 0x10, StopPipboyMode };  // PipboyManager::OnPipboyOpenAnimFailed
+		inline static REL::THook _StopPipboyMode1{ REL::ID(2225458), 0x90, StopPipboyMode };  // PipboyManager::OnPipboyClosed
+		inline static REL::THook _StopPipboyMode2{ REL::ID(2225480), 0x90, StopPipboyMode };  // PipboyManager::ClosedownPipboy
 	};
 
-	class hkSetWeaponBonesCulled :
-		public REX::Singleton<hkSetWeaponBonesCulled>
+	class hkSetWeaponBonesCulled
 	{
 	private:
 		static bool SetWeaponBonesCulled(
@@ -1533,13 +1511,12 @@ private:
 			return true;
 		}
 
-		inline static REL::Hook _SetWeaponBonesCulled0{ REL::ID(2225458), 0x11F, SetWeaponBonesCulled };  // PipboyManager::OnPipboyClosed
-		inline static REL::Hook _SetWeaponBonesCulled1{ REL::ID(2225479), 0x0A7, SetWeaponBonesCulled };  // PipboyManager::InitPipboy
-		inline static REL::Hook _SetWeaponBonesCulled2{ REL::ID(2225480), 0x11F, SetWeaponBonesCulled };  // PipboyManager::ClosedownPipboy
+		inline static REL::THook _SetWeaponBonesCulled0{ REL::ID(2225458), 0x11F, SetWeaponBonesCulled };  // PipboyManager::OnPipboyClosed
+		inline static REL::THook _SetWeaponBonesCulled1{ REL::ID(2225479), 0x0A7, SetWeaponBonesCulled };  // PipboyManager::InitPipboy
+		inline static REL::THook _SetWeaponBonesCulled2{ REL::ID(2225480), 0x11F, SetWeaponBonesCulled };  // PipboyManager::ClosedownPipboy
 	};
 
-	class hkDoAction :
-		public REX::Singleton<hkDoAction>
+	class hkDoAction
 	{
 	private:
 		static bool DoAction(
@@ -1555,13 +1532,12 @@ private:
 			return true;
 		}
 
-		inline static REL::Hook _DoAction0{ REL::ID(2225450), 0x1D3, DoAction };  // PipboyManager::OnPipboyOpened
-		inline static REL::Hook _DoAction1{ REL::ID(2225452), 0x04C, DoAction };  // PipboyManager::StopExamineMenu
-		inline static REL::Hook _DoAction2{ REL::ID(2225454), 0x061, DoAction };  // PipboyManager::LowerPipboy
+		inline static REL::THook _DoAction0{ REL::ID(2225450), 0x1D3, DoAction };  // PipboyManager::OnPipboyOpened
+		inline static REL::THook _DoAction1{ REL::ID(2225452), 0x04C, DoAction };  // PipboyManager::StopExamineMenu
+		inline static REL::THook _DoAction2{ REL::ID(2225454), 0x061, DoAction };  // PipboyManager::LowerPipboy
 	};
 
-	class hkQueueShowPipboy :
-		public REX::Singleton<hkQueueShowPipboy>
+	class hkQueueShowPipboy
 	{
 	private:
 		static void QueueShowPipboy(
@@ -1576,11 +1552,10 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _QueueShowPipboy0{ REL::ID(2225444), 0x89, QueueShowPipboy };  // PipboyManager::PlayPipboyOpenAnim
+		inline static REL::THook _QueueShowPipboy0{ REL::ID(2225444), 0x89, QueueShowPipboy };  // PipboyManager::PlayPipboyOpenAnim
 	};
 
-	class hkQueueClosePipboy :
-		public REX::Singleton<hkQueueClosePipboy>
+	class hkQueueClosePipboy
 	{
 	private:
 		static void QueueClosePipboy(
@@ -1594,12 +1569,11 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _QueueClosePipboy0{ REL::ID(2225450), 0xE1, QueueClosePipboy };  // PipboyManager::OnPipboyOpened
-		inline static REL::Hook _QueueClosePipboy1{ REL::ID(2225456), 0xCC, QueueClosePipboy };  // PipboyManager::PlayPipboyCloseAnim
+		inline static REL::THook _QueueClosePipboy0{ REL::ID(2225450), 0xE1, QueueClosePipboy };  // PipboyManager::OnPipboyOpened
+		inline static REL::THook _QueueClosePipboy1{ REL::ID(2225456), 0xCC, QueueClosePipboy };  // PipboyManager::PlayPipboyCloseAnim
 	};
 
-	class hkSetEnableDynamicResolution :
-		public REX::Singleton<hkSetEnableDynamicResolution>
+	class hkSetEnableDynamicResolution
 	{
 	private:
 		static void SetEnableDynamicResolution(
@@ -1609,12 +1583,11 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _SetEnableDynamicResolution0{ REL::ID(2225457), 0x10F, SetEnableDynamicResolution };  // PipboyManager::OnPipboyCloseAnim
-		inline static REL::Hook _SetEnableDynamicResolution1{ REL::ID(2225479), 0x275, SetEnableDynamicResolution };  // PipboyManager::InitPipboy
+		inline static REL::THook _SetEnableDynamicResolution0{ REL::ID(2225457), 0x10F, SetEnableDynamicResolution };  // PipboyManager::OnPipboyCloseAnim
+		inline static REL::THook _SetEnableDynamicResolution1{ REL::ID(2225479), 0x275, SetEnableDynamicResolution };  // PipboyManager::InitPipboy
 	};
 
-	class hkStopAnimationGraphListening :
-		public REX::Singleton<hkStopAnimationGraphListening>
+	class hkStopAnimationGraphListening
 	{
 	private:
 		static void StopAnimationGraphListening(
@@ -1633,13 +1606,12 @@ private:
 			return _StopAnimationGraphListening0(a_this);
 		}
 
-		inline static REL::Hook _StopAnimationGraphListening0{ REL::ID(2225449), 0x18, StopAnimationGraphListening };  // PipboyManager::OnPipboyOpenAnimFailed
-		inline static REL::Hook _StopAnimationGraphListening1{ REL::ID(2225458), 0xE2, StopAnimationGraphListening };  // PipboyManager::OnPipboyClosed
-		inline static REL::Hook _StopAnimationGraphListening2{ REL::ID(2225480), 0xE2, StopAnimationGraphListening };  // PipboyManager::ClosedownPipboy
+		inline static REL::THook _StopAnimationGraphListening0{ REL::ID(2225449), 0x18, StopAnimationGraphListening };  // PipboyManager::OnPipboyOpenAnimFailed
+		inline static REL::THook _StopAnimationGraphListening1{ REL::ID(2225458), 0xE2, StopAnimationGraphListening };  // PipboyManager::OnPipboyClosed
+		inline static REL::THook _StopAnimationGraphListening2{ REL::ID(2225480), 0xE2, StopAnimationGraphListening };  // PipboyManager::ClosedownPipboy
 	};
 
-	class hkShouldHandleEvent :
-		public REX::Singleton<hkShouldHandleEvent>
+	class hkShouldHandleEvent
 	{
 	private:
 		static bool ShouldHandleEvent(
@@ -1649,11 +1621,10 @@ private:
 			return _ShouldHandleEvent0(a_this, a_event) && !MCM::Settings::Runtime::bQuickBoyTransition;
 		}
 
-		inline static REL::HookVFT _ShouldHandleEvent0{ RE::PipboyMenu::VTABLE[1], 0x01, ShouldHandleEvent };
+		inline static REL::THookVFT _ShouldHandleEvent0{ RE::PipboyMenu::VTABLE[1], 0x01, ShouldHandleEvent };
 	};
 
-	class hkOnButtonEvent :
-		public REX::Singleton<hkOnButtonEvent>
+	class hkOnButtonEvent
 	{
 	private:
 		static void OnButtonEvent(
@@ -1674,11 +1645,10 @@ private:
 			return _OnButtonEvent0(a_this, a_event);
 		}
 
-		inline static REL::HookVFT _OnButtonEvent0{ RE::PipboyMenu::VTABLE[1], 0x08, OnButtonEvent };
+		inline static REL::THookVFT _OnButtonEvent0{ RE::PipboyMenu::VTABLE[1], 0x08, OnButtonEvent };
 	};
 
-	class hkSetModelScale :
-		public REX::Singleton<hkSetModelScale>
+	class hkSetModelScale
 	{
 	private:
 		static void SetModelScale(
@@ -1693,11 +1663,10 @@ private:
 			return _SetModelScale0(a_this, MCM::Settings::Pipboy::fPipboy3DItemScale);
 		}
 
-		inline static REL::Hook _SetModelScale0{ REL::ID(2225479), 0x1D7, SetModelScale };  // PipboyManager::InitPipboy
+		inline static REL::THook _SetModelScale0{ REL::ID(2225479), 0x1D7, SetModelScale };  // PipboyManager::InitPipboy
 	};
 
-	class hkSetModelScreenPosition :
-		public REX::Singleton<hkSetModelScreenPosition>
+	class hkSetModelScreenPosition
 	{
 	private:
 		static void SetModelScreenPosition(
@@ -1718,11 +1687,10 @@ private:
 			return _SetModelScreenPosition0(a_this, ScreenPosition, a_screenCoords);
 		}
 
-		inline static REL::Hook _SetModelScreenPosition0{ REL::ID(2225479), 0x1B2, SetModelScreenPosition };  // PipboyManager::InitPipboy
+		inline static REL::THook _SetModelScreenPosition0{ REL::ID(2225479), 0x1B2, SetModelScreenPosition };  // PipboyManager::InitPipboy
 	};
 
-	class hkKillScreenEffects :
-		public REX::Singleton<hkKillScreenEffects>
+	class hkKillScreenEffects
 	{
 	private:
 		static void KillScreenEffects()
@@ -1740,11 +1708,10 @@ private:
 			return _KillScreenEffects0();
 		}
 
-		inline static REL::Hook _KillScreenEffects0{ REL::ID(2224181), 0x6B, KillScreenEffects };  // PipboyMenu::ProcessMessage
+		inline static REL::THook _KillScreenEffects0{ REL::ID(2224181), 0x6B, KillScreenEffects };  // PipboyMenu::ProcessMessage
 	};
 
-	class hkInstanceFormTrigger :
-		public REX::Singleton<hkInstanceFormTrigger>
+	class hkInstanceFormTrigger
 	{
 	private:
 		static void InstanceFormTrigger(
@@ -1763,11 +1730,10 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _InstanceFormTrigger0{ REL::ID(2225479), 0x240, InstanceFormTrigger };  // PipboyManager::InitPipboy
+		inline static REL::THook _InstanceFormTrigger0{ REL::ID(2225479), 0x240, InstanceFormTrigger };  // PipboyManager::InitPipboy
 	};
 
-	class hkShowPipboyLight :
-		public REX::Singleton<hkShowPipboyLight>
+	class hkShowPipboyLight
 	{
 	private:
 		static void ShowPipboyLight(
@@ -1783,12 +1749,11 @@ private:
 			return;
 		}
 
-		inline static REL::Hook _ShowPipboyLight0{ REL::ID(2225457), 0x0A4, ShowPipboyLight };  // PipboyManager::OnPipboyCloseAnim
-		inline static REL::Hook _ShowPipboyLight1{ REL::ID(2225479), 0x34E, ShowPipboyLight };  // PipboyManager::InitPipboy
+		inline static REL::THook _ShowPipboyLight0{ REL::ID(2225457), 0x0A4, ShowPipboyLight };  // PipboyManager::OnPipboyCloseAnim
+		inline static REL::THook _ShowPipboyLight1{ REL::ID(2225479), 0x34E, ShowPipboyLight };  // PipboyManager::InitPipboy
 	};
 
-	class hkRenderEffect : 
-		public REX::Singleton<hkRenderEffect>
+	class hkRenderEffect
 	{
 	private:
 		static void RenderEffect(
@@ -1806,6 +1771,6 @@ private:
 			return _RenderEffect0(a_this, a_effect, a_sourceTarget, a_destTarget, a_param);
 		}
 
-		inline static REL::Hook _RenderEffect0{ REL::ID(2222569), 0x1C0, RenderEffect };  // Interface3D::Renderer::DrawPostFX
+		inline static REL::THook _RenderEffect0{ REL::ID(2222569), 0x1C0, RenderEffect };  // Interface3D::Renderer::DrawPostFX
 	};
 };

@@ -9,13 +9,11 @@ namespace
 		switch (a_msg->type)
 		{
 		case F4SE::MessagingInterface::kGameDataReady:
-		{
 			if (static_cast<bool>(a_msg->data))
 			{
 				Hooks::Install();
 			}
 			break;
-		}
 		default:
 			break;
 		}

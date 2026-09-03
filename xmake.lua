@@ -18,6 +18,8 @@ set_config("commonlib_json", true)
 
 -- define targets
 target("BakaFullscreenPipboy")
+    add_deps("BakaFullscreenPipboy.papyrus", { order = true })
+
     add_rules("commonlibf4.plugin", {
         name = "BakaFullscreenPipboy",
         author = "shad0wshayd3"
@@ -31,3 +33,13 @@ target("BakaFullscreenPipboy")
 
     -- add extra files
     add_extrafiles(".clang-format")
+
+    -- add install files
+    add_installfiles("res/(**)")
+
+target("BakaFullscreenPipboy.papyrus")
+    add_rules("commonlibf4.papyrus", {
+        archive = "BakaFullscreenPipboy.archive"
+    })
+
+    add_extrafiles("res/Scripts/Source/Baka/(**.psc)")
